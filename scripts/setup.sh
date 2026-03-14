@@ -62,6 +62,29 @@ for _ in $(seq 1 30); do
   sleep 2
 done
 
+DEPS_READY=false
+for _ in $(seq 1 45); do
+  if docker compose \
+    --project-name "${PROJECT_NAME}" \
+    "${ENV_ARGS[@]}" \
+    -f "${ROOT_DIR}/docker-compose.dev.yml" \
+    exec -T server sh -lc 'test -x /workspace/node_modules/.bin/tsx' >/dev/null 2>&1; then
+    DEPS_READY=true
+    break
+  fi
+  sleep 2
+done
+
+if [[ "${DEPS_READY}" != "true" ]]; then
+  echo "ERROR: Server dependencies were not ready before running migrations." >&2
+  docker compose \
+    --project-name "${PROJECT_NAME}" \
+    "${ENV_ARGS[@]}" \
+    -f "${ROOT_DIR}/docker-compose.dev.yml" \
+    logs --tail=200 server >&2 || true
+  exit 1
+fi
+
 docker compose \
   --project-name "${PROJECT_NAME}" \
   "${ENV_ARGS[@]}" \

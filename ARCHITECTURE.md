@@ -58,7 +58,7 @@ The control plane decides what is allowed to run and why. The execution plane pe
 - Evidence is immutable even if workspaces are cleaned up later.
 - Fastify owns API and site hosting in v1.
 - UI work must remain responsive, accessible, and integrated into the single-site architecture.
-- Significant UI/UX work should use the [$frontend-design](/Users/rnikitin/.codex/skills/frontend-design/SKILL.md) skill before implementation.
+- Significant UI/UX work should use the `frontend-design` skill before implementation.
 - Non-trivial changes follow `docs/PLANS.md`, then `openspec/` when required by the change tier.
 
 ## Where to Go Deeper

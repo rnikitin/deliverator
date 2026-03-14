@@ -23,7 +23,7 @@ Examples:
 - a complex bug fix that spans several files
 
 For Tier 1:
-- use the [$execplan](/Users/rnikitin/.codex/skills/execplan/SKILL.md) skill first
+- use the `execplan` skill first
 - save the ExecPlan under `docs/plans/YYYY-MM-DD-<slug>.md`
 - keep it updated as a living document
 - stop for explicit user approval after the ExecPlan is ready before implementing
@@ -56,7 +56,7 @@ If a task grows during discovery, promote it and record the promotion in the pla
 
 ## ExecPlan Standard
 
-Use the [$execplan](/Users/rnikitin/.codex/skills/execplan/SKILL.md) skill for Tier 1 and Tier 2 work.
+Use the `execplan` skill for Tier 1 and Tier 2 work.
 
 ExecPlans should:
 - be self-contained enough for a novice to execute
@@ -73,11 +73,11 @@ Use OpenSpec for Tier 2 work. OpenSpec is the formal artifact layer for changes 
 
 Start with:
 - `openspec/project.md`
-- the `.claude/skills/openspec-*` and `.codex/skills/openspec-*` workflows already present in this repo
+- the repo's checked-in OpenSpec workflows
 
 ## UI and UX Planning
 
-For substantial UI or UX work, use the [$frontend-design](/Users/rnikitin/.codex/skills/frontend-design/SKILL.md) skill before implementation.
+For substantial UI or UX work, use the `frontend-design` skill before implementation.
 
 This applies to:
 - new pages

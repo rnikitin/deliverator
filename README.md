@@ -37,7 +37,7 @@ The setup script creates `.env` from `.env.example` when needed, generates `.del
 
 Current validation note:
 - the foundation code path has been validated host-run with `pnpm typecheck`, `pnpm lint`, `pnpm test`, HTTP smoke checks, and browser smoke checks
-- the full Docker-backed `make dev` smoke path still requires a working local Docker daemon
+- the Docker-backed dev flow has also been validated with `make dev-start` and `make smoke-services` in an environment with a working local Docker daemon
 
 ## Useful Commands
 
@@ -109,4 +109,4 @@ This repo uses the three-tier planning model documented in `docs/PLANS.md`.
 - multi-step internal changes require an ExecPlan
 - capability or architecture changes require both an ExecPlan and OpenSpec
 
-For substantial UI or UX work, use the [$frontend-design](/Users/rnikitin/.codex/skills/frontend-design/SKILL.md) skill before implementation.
+For substantial UI or UX work, start with a design brief. If you are using the repository's AI workflows, that usually means the `frontend-design` skill before implementation.

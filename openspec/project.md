@@ -65,7 +65,7 @@ Important domain ideas:
 - Prefer small, cohesive modules with obvious control flow. As a default target, keep functions under roughly 50 lines and files under roughly 300 lines unless a cohesive module benefits from more.
 - Use structured logs with stable field names rather than ad-hoc debug printing.
 - Keep tests close to the package or module they validate once code exists.
-- For substantial UI/UX work, use the [$frontend-design](/Users/rnikitin/.codex/skills/frontend-design/SKILL.md) skill to set a clear visual direction before implementation.
+- For substantial UI/UX work, use the `frontend-design` skill to set a clear visual direction before implementation.
 
 ## Testing Strategy
 - Unit tests for pure logic in core workflow, policy, schema, and state-machine code.
@@ -96,7 +96,7 @@ Important domain ideas:
   - Tier 0: short plan only for trivial, low-risk changes
   - Tier 1: create an ExecPlan first for multi-step or internal behavior-impacting work
   - Tier 2: create an ExecPlan first, then create or update OpenSpec artifacts before implementation
-- Use the [$execplan](/Users/rnikitin/.codex/skills/execplan/SKILL.md) skill for Tier 1 and Tier 2 planning and follow `docs/PLANS.md` as the repo-local planning standard.
+- Use the `execplan` skill for Tier 1 and Tier 2 planning and follow `docs/PLANS.md` as the repo-local planning standard.
 - OpenSpec is required for:
   - new capabilities
   - user-facing features
@@ -105,7 +105,7 @@ Important domain ideas:
   - cross-package changes
   - security-sensitive or performance-sensitive work
   - ambiguous work likely to drift without formal artifacts
-- Significant UI/UX work should reference the [$frontend-design](/Users/rnikitin/.codex/skills/frontend-design/SKILL.md) skill in the planning artifacts.
+- Significant UI/UX work should reference the `frontend-design` skill in the planning artifacts.
 - If scope grows during discovery, promote the task to the higher tier and record that in the artifacts.
 
 Implemented changes must be recorded in `docs/CHANGELOG.md`.

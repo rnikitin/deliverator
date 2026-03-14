@@ -30,5 +30,5 @@ Start here:
 - Record implemented changes in `docs/CHANGELOG.md`.
 - Follow `docs/PLANS.md` to decide whether a short plan, an ExecPlan, or OpenSpec is required.
 - The current runtime is one Fastify-hosted site with a Vite-managed React SPA. Do not reintroduce a second frontend runtime or SSR without an explicit new change decision.
-- For substantial UI/UX work, use the [$frontend-design](/Users/rnikitin/.codex/skills/frontend-design/SKILL.md) skill before implementation.
+- For substantial UI/UX work, use the `frontend-design` skill before implementation.
 - Treat `docs/research/` as read-only reference material unless the user explicitly asks to edit it.

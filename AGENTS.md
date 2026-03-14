@@ -79,7 +79,7 @@
 - `Tier 1: ExecPlan required, OpenSpec optional`
   - Use for multi-step work, internal behavioral changes, or work that spans several files but does not introduce a new capability or architectural shift.
   - Examples: a moderate refactor inside one subsystem, an internal adapter/runner cleanup, or a complex bug fix that needs explicit sequencing.
-  - Start with the [$execplan](/Users/rnikitin/.codex/skills/execplan/SKILL.md) skill. Add OpenSpec only if discovery reveals Tier 2 characteristics.
+  - Start with the `execplan` skill. Add OpenSpec only if discovery reveals Tier 2 characteristics.
 - `Tier 2: ExecPlan plus OpenSpec required`
   - Use for new capabilities, user-facing features, API/schema/config/public-surface changes, architecture or workflow-semantics changes, cross-package changes, security-sensitive work, performance-sensitive work, or ambiguous work with high drift risk.
   - Sequence: `ExecPlan -> OpenSpec -> implementation`.
@@ -89,13 +89,13 @@
 ## Workflow and Change Management
 - Start by deciding which tier the work belongs to.
 - For Tier 0 work, write a short concrete plan and then implement.
-- For Tier 1 work, create an ExecPlan with the [$execplan](/Users/rnikitin/.codex/skills/execplan/SKILL.md) skill before implementation.
+- For Tier 1 work, create an ExecPlan with the `execplan` skill before implementation.
 - For Tier 2 work, create an ExecPlan first, then create or update OpenSpec artifacts, then implement.
 - For Tier 1 and Tier 2 work, stop after the ExecPlan is drafted and get explicit user approval before moving into implementation. If OpenSpec is also required, create or update the OpenSpec artifacts, present them for review, and wait for a clear go-ahead before coding.
 - Follow `docs/PLANS.md` for the repo-local planning standard.
 - Save active ExecPlans under `docs/plans/` and keep them updated as living documents.
-- Use the OpenSpec skills already present under `.claude/skills/` and `.codex/skills/` when doing OpenSpec work.
-- For substantial UI or UX work, use the [$frontend-design](/Users/rnikitin/.codex/skills/frontend-design/SKILL.md) skill before implementation.
+- Use the repo's checked-in OpenSpec workflows when doing OpenSpec work.
+- For substantial UI or UX work, use the `frontend-design` skill before implementation.
 - Record implemented changes in `docs/CHANGELOG.md` before considering the work complete.
 - Keep `AGENTS.md` and `CLAUDE.md` aligned in the same change set whenever root policy changes.
 
@@ -130,7 +130,7 @@
 - Introduce one vertical slice at a time rather than scaffolding the whole roadmap up front.
 - Reconcile new work with the build order in `docs/research/docs/12-mvp-and-build-order.md`.
 - For significant UI surface work, treat visual direction, responsiveness, accessibility, and interaction quality as first-class design requirements rather than finishing touches.
-- Use the [$frontend-design](/Users/rnikitin/.codex/skills/frontend-design/SKILL.md) skill for complex pages, dashboards, landing surfaces, or large UX redesigns.
+- Use the `frontend-design` skill for complex pages, dashboards, landing surfaces, or large UX redesigns.
 - When introducing a new subsystem, specify:
   - why it belongs in the current phase
   - what contract it exposes

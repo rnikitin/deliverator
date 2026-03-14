@@ -43,7 +43,18 @@ describe("api routes", () => {
     expect(healthResponse.statusCode).toBe(200);
 
     const configResponse = await app.inject({ method: "GET", url: "/api/config/compiled" });
-    expect(configResponse.json()).toEqual(buildCompiledConfig(config));
+    const actualCompiledConfig = configResponse.json();
+    const expectedCompiledConfig = buildCompiledConfig(config);
+    expect(actualCompiledConfig.generatedAt).toEqual(expect.any(String));
+    expect(
+      {
+        ...actualCompiledConfig,
+        generatedAt: "<dynamic>"
+      }
+    ).toEqual({
+      ...expectedCompiledConfig,
+      generatedAt: "<dynamic>"
+    });
 
     const taskResponse = await app.inject({ method: "GET", url: "/api/tasks/task-foundation" });
     expect(taskResponse.statusCode).toBe(200);

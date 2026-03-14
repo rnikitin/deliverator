@@ -26,5 +26,5 @@
 
 - [x] 5.1 Run `openspec list` after implementation.
 - [x] 5.2 Run `pnpm typecheck`, `pnpm lint`, and `pnpm test` after implementation.
-- [ ] 5.3 Smoke-test `make dev` and the service endpoints after implementation. Host-run service endpoints are verified; Docker-backed `make dev` validation is blocked in this environment because the Docker daemon is unavailable.
+- [x] 5.3 Smoke-test `make dev` and the service endpoints after implementation. `make dev-start` and `make smoke-services` now pass, including the API routes, UI shell routes, SSE, and observability endpoints.
 - [x] 5.4 Update `ARCHITECTURE.md`, `docs/index.md`, `README.md`, and `docs/CHANGELOG.md` after implementation.

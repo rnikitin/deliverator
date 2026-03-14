@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree -L 4 -I 'node_modules' /Users/rnikitin/dev/deliverator/apps/server 2>/dev/null || find /Users/rnikitin/dev/deliverator/apps/server -type d -not -path '*/node_modules*' -not -path '*/.vite*' | head -30)"
+    ]
+  }
+}

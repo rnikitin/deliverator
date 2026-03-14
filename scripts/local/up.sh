@@ -31,7 +31,7 @@ if [[ "${WATCH_ONLY}" == "true" ]]; then
     --project-name "${PROJECT_NAME}" \
     "${ENV_ARGS[@]}" \
     -f "${ROOT_DIR}/docker-compose.dev.yml" \
-    up --watch --remove-orphans server
+    up --watch server
 fi
 
 if [[ "${DETACH}" == "true" ]]; then
@@ -39,7 +39,7 @@ if [[ "${DETACH}" == "true" ]]; then
     --project-name "${PROJECT_NAME}" \
     "${ENV_ARGS[@]}" \
     -f "${ROOT_DIR}/docker-compose.dev.yml" \
-    up -d --build --remove-orphans server
+    up -d --build server
   exit 0
 fi
 
@@ -47,4 +47,4 @@ exec docker compose \
   --project-name "${PROJECT_NAME}" \
   "${ENV_ARGS[@]}" \
   -f "${ROOT_DIR}/docker-compose.dev.yml" \
-  up --build --remove-orphans server
+  up --build server
