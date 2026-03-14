@@ -1,0 +1,27 @@
+{
+  "name": "@deliverator/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "development": "./src/index.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src test --ext .ts",
+    "test": "vitest run test/**/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@deliverator/contracts": "workspace:*",
+    "@deliverator/core": "workspace:*",
+    "@deliverator/shared": "workspace:*",
+    "better-sqlite3": "^12.2.0"
+  }
+}

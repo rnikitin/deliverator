@@ -1,0 +1,21 @@
+version: 1
+
+user:
+  id: roma
+  display_name: Roma
+
+recipes:
+  research.execplan:
+    resolution: local_file
+    path: ~/.deliverator/recipes/research.execplan.yml
+
+skills:
+  execplan:
+    type: claude_skill
+    path: ~/.deliverator/skills/execplan
+
+preferences:
+  default_agents:
+    discovery: claude_cli
+    research.execplan: claude_cli
+    research.openspec: codex_cli

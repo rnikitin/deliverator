@@ -1,0 +1,61 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmitOnError": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@deliverator/contracts": [
+        "packages/contracts/src/index.ts"
+      ],
+      "@deliverator/shared": [
+        "packages/shared/src/index.ts"
+      ],
+      "@deliverator/core": [
+        "packages/core/src/index.ts"
+      ],
+      "@deliverator/db": [
+        "packages/db/src/index.ts"
+      ],
+      "@deliverator/artifacts": [
+        "packages/artifacts/src/index.ts"
+      ],
+      "@deliverator/runner": [
+        "packages/runner/src/index.ts"
+      ],
+      "@deliverator/adapter-local-process": [
+        "packages/adapters/local-process/src/index.ts"
+      ],
+      "@deliverator/adapter-git-worktree": [
+        "packages/adapters/git-worktree/src/index.ts"
+      ],
+      "@deliverator/adapter-github-cli": [
+        "packages/adapters/github-cli/src/index.ts"
+      ],
+      "@deliverator/adapter-codex-cli": [
+        "packages/adapters/codex-cli/src/index.ts"
+      ],
+      "@deliverator/adapter-claude-cli": [
+        "packages/adapters/claude-cli/src/index.ts"
+      ],
+      "@deliverator/adapter-openspec-cli": [
+        "packages/adapters/openspec-cli/src/index.ts"
+      ]
+    }
+  }
+}

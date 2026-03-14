@@ -1,0 +1,25 @@
+version: 1
+
+board:
+  default_group_by: swimlane
+  default_filters:
+    stage: active
+
+projects:
+  - project_id: app-web
+    name: App Web
+    repo_path: ~/src/app-web
+    default_branch: main
+    workflow_file: .deliverator/workflow.yml
+    deliverator_md_path: DELIVERATOR.md
+    swimlane: Product
+    enabled: true
+
+  - project_id: platform-api
+    name: Platform API
+    repo_path: ~/src/platform-api
+    default_branch: main
+    workflow_file: .deliverator/workflow.yml
+    deliverator_md_path: DELIVERATOR.md
+    swimlane: Platform
+    enabled: true

@@ -1,0 +1,73 @@
+schema: spec-driven
+
+context: |
+  DELIVERATOR is a workflow orchestration system for AI CLI agents. It is a long-running workflow service, not a top-level autonomous agent.
+
+  Current phase: pre-implementation harness bootstrap. This repository currently contains architecture research, ADRs, example workflow artifacts, and OpenSpec skills, but no application source code or monorepo bootstrap yet.
+
+  Treat docs/research/ as imported reference material. Read it before planning non-trivial work, but do not modify it unless the user explicitly asks to edit the research pack itself.
+
+  Repo-local source of truth documents:
+  - AGENTS.md for cross-tool workflow policy
+  - CLAUDE.md as the Claude-oriented mirror of the same policy
+  - ARCHITECTURE.md for the high-level codemap
+  - docs/index.md for the knowledge-base table of contents
+  - docs/PLANS.md for planning and change-management rules
+  - docs/CHANGELOG.md for implementation history
+  - openspec/project.md for OpenSpec-facing conventions
+
+  Target stack and conventions:
+  - Node.js 22
+  - TypeScript with strict settings
+  - pnpm as the package manager
+  - Fastify as the server runtime
+  - React + Vite for the UI, hosted by the Fastify app
+  - SQLite for v1 persistence
+  - execa or equivalent for subprocess execution
+  - Pino-compatible structured logging
+
+  Intended monorepo direction comes from docs/research/docs/15-codebase-layout.md, with one explicit repo-level decision: do not create a separate frontend runtime in v1. Fastify owns API routes, SSE, and site hosting. Vite is integrated into the Fastify app so the product runs as one site, not two independently served applications.
+
+  Governing architecture principles:
+  - Workspace over session continuity: docs/research/docs/adr/0001-workspace-over-session.md
+  - Deterministic core, no top-level agent: docs/research/docs/adr/0002-deterministic-core-no-top-level-agent.md
+  - TypeScript + Fastify + React + SQLite baseline: docs/research/docs/adr/0003-typescript-fastify-react-sqlite.md
+  - No separate BFF in v1: docs/research/docs/adr/0004-no-separate-bff-in-v1.md
+  - Action / recipe / adapter separation: docs/research/docs/adr/0005-action-recipe-adapter-model.md
+  - Immutable evidence store: docs/research/docs/adr/0006-immutable-evidence-store.md
+
+  Build order guidance lives in docs/research/docs/12-mvp-and-build-order.md. Use it to keep proposals scoped to the current implementation phase instead of scaffolding the entire system at once.
+
+  Change management policy:
+  - Tier 0: short plan only for trivial, low-risk work such as formatting, doc cleanup, narrow bug fixes that restore intended behavior, tests for existing behavior, and tiny refactors with no contract or behavior change.
+  - Tier 1: create an ExecPlan first for multi-step or behavior-impacting work that stays inside an existing subsystem and does not introduce a new capability or architectural shift. Use the execplan skill for this.
+  - Tier 2: create an ExecPlan first, then create or update OpenSpec artifacts before implementation. Tier 2 is required for new capabilities, user-facing features, API/schema/config/public-surface changes, architecture or workflow-semantics changes, cross-package changes, security-sensitive work, performance-sensitive work, or ambiguous work with high drift risk.
+  - If unsure, escalate to the higher tier. If the scope grows during discovery, promote the task and record the promotion in the planning artifacts.
+
+  Until this repo defines a PLANS.md standard, use the execplan skill directly for Tier 1 and Tier 2 work. If a repo-local planning standard is added later, follow it in addition to the skill contract.
+
+rules:
+  proposal:
+    - Classify the work using the repo triage policy before drafting the proposal.
+    - Tier 2 work requires an ExecPlan before OpenSpec authoring begins.
+    - Keep each proposal scoped to one package or one cohesive vertical slice.
+    - Include explicit non-goals so the first implementation does not sprawl.
+    - Explain the user-visible or operator-visible outcome, not only internal code movement.
+    - Reference the relevant build-order phase from docs/research/docs/12-mvp-and-build-order.md.
+    - Call out architecture impact, public contract impact, review risks, observability/evidence impact, and rollback considerations when relevant.
+    - If the proposal includes substantial UI or UX work, require use of the frontend-design skill and describe the intended visual/interaction direction.
+    - If the work changes runtime boundaries, explain why the chosen boundary fits the current v1 architecture.
+  tasks:
+    - Break work into small, verifiable increments that can be completed and reviewed independently.
+    - Each task must end with an observable outcome: a test, a command result, a UI behavior, or a documented artifact.
+    - Prefer tasks that fit in one implementation session and one review pass.
+    - If a task depends on architectural clarification, resolve that in the ExecPlan or design artifact before implementation.
+    - Escalate from Tier 0 to Tier 1 or Tier 2 if discovery reveals broader impact than originally expected.
+  design:
+    - Reference the ADRs and research docs that constrain the design.
+    - Define package ownership, interface boundaries, runtime boundaries, and failure modes explicitly.
+    - State which parts of the system remain deterministic code and which parts may delegate to agent adapters.
+    - Keep IO at the edges and keep core workflow/state-machine logic pure and explicit.
+    - For substantial UI/UX work, describe the visual direction, responsive constraints, accessibility expectations, and where the frontend-design skill informs the design.
+    - If introducing a new contract, name the intended files, types, and validation strategy.
+    - If deviating from the research pack, explain the decision and why it is a deliberate repo-level override.

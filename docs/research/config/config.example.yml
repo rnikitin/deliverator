@@ -1,0 +1,38 @@
+version: 1
+
+server:
+  host: 127.0.0.1
+  port: 4317
+
+paths:
+  data_dir: ~/.deliverator/data
+  worktree_dir: ~/.deliverator/worktrees
+  logs_dir: ~/.deliverator/logs
+
+defaults:
+  runtime: local_process
+  workspace: git_worktree
+  scm: github_cli
+  notifiers: []
+
+concurrency:
+  global_active_runs: 4
+  per_project_active_runs: 2
+  per_agent:
+    claude_cli: 1
+    codex_cli: 1
+
+retention:
+  keep_run_logs_days: 90
+  keep_artifact_snapshots_days: 180
+
+security:
+  redact_env_keys:
+    - OPENAI_API_KEY
+    - ANTHROPIC_API_KEY
+    - GITHUB_TOKEN
+
+features:
+  enable_tmux_runtime: true
+  enable_docker_compose_runtime: true
+  enable_operator_cli: true

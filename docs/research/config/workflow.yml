@@ -1,0 +1,148 @@
+version: 1
+workflow_id: deliverator-default
+
+board:
+  columns:
+    - inbox
+    - discovery
+    - research
+    - build_test
+    - feedback
+    - deploy
+    - done
+  swimlanes:
+    by: project
+  filters:
+    - project
+    - stage
+    - attention_state
+    - priority
+    - has_pr
+    - requires_human
+
+policies:
+  manual_moves_only:
+    - inbox
+    - discovery
+    - research
+    - feedback
+  auto_moves_allowed:
+    - build_test
+    - deploy
+
+stages:
+  inbox:
+    title: Inbox
+    mode: manual
+    description: User prepares the task, writes the description, and attaches artifacts.
+    allowed_manual_moves_to:
+      - discovery
+
+  discovery:
+    title: Discovery
+    mode: hybrid
+    entry_actions:
+      - kind: workspace.ensure
+        uses: git_worktree
+      - kind: scm.branch.ensure
+        uses: github_cli
+      - kind: scm.pr.ensure
+        uses: github_cli
+    actions:
+      - uses: recipe.discovery.questions
+    gates:
+      - kind: await_human_input
+        materialize_to: artifacts/current/discovery_answers.md
+    allowed_manual_moves_to:
+      - research
+
+  research:
+    title: Research
+    mode: hybrid
+    actions:
+      - uses: recipe.research.execplan
+      - uses: recipe.research.openspec
+    feedback_loop:
+      on_new_human_comments:
+        - kind: artifacts.materialize_feedback
+          uses: builtin
+        - uses: recipe.research.execplan
+        - uses: recipe.research.openspec
+    gates:
+      - kind: await_human_approval
+    exit_actions:
+      - kind: scm.commit_if_changed
+        uses: builtin_git
+      - kind: scm.push_if_changed
+        uses: github_cli
+    allowed_manual_moves_to:
+      - build_test
+
+  build_test:
+    title: Build&Test
+    mode: automated
+    entry_actions:
+      - kind: runtime.dev.up
+        uses: docker_compose
+      - kind: runtime.observability.up
+        uses: docker_compose
+    loop:
+      max_iterations: 12
+      max_no_progress_iterations: 2
+      max_same_open_items_repeats: 2
+      body:
+        - kind: openspec.list_open_items
+          uses: openspec_cli
+        - uses: recipe.build.loop
+    completion:
+      all_of:
+        - openspec.no_open_items
+        - tests.all_green
+        - review.no_blockers
+        - runtime.dev_boot_ok
+    exit_actions:
+      - kind: scm.commit_if_changed
+        uses: builtin_git
+      - kind: scm.push_if_changed
+        uses: github_cli
+      - kind: board.move
+        uses: builtin
+        with:
+          to: feedback
+
+  feedback:
+    title: Feedback
+    mode: hybrid
+    feedback_loop:
+      on_new_human_comments:
+        - kind: artifacts.materialize_feedback
+          uses: builtin
+        - uses: recipe.feedback.apply
+        - kind: scm.commit_if_changed
+          uses: builtin_git
+        - kind: scm.push_if_changed
+          uses: github_cli
+    allowed_manual_moves_to:
+      - research
+      - deploy
+
+  deploy:
+    title: Deploy
+    mode: hybrid
+    actions:
+      - uses: recipe.deploy.finalize
+    gates:
+      - kind: await_archive
+    exit_actions:
+      - kind: scm.branch.delete
+        uses: github_cli
+      - kind: workspace.cleanup
+        uses: git_worktree
+      - kind: board.move
+        uses: builtin
+        with:
+          to: done
+
+  done:
+    title: Done
+    mode: terminal

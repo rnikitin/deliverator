@@ -1,0 +1,64 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: ["./scripts/local/container-entrypoint.sh"]
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DELIVERATOR_DATA_DIR: /workspace/.deliverator/data
+      DELIVERATOR_WORKTREE_DIR: /workspace/.deliverator/worktrees
+      DELIVERATOR_LOGS_DIR: /workspace/.deliverator/logs
+      OTEL_SERVICE_NAME: deliverator-server
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://host.docker.internal:${OTLP_HTTP_PORT:-4318}}
+      VITE_DELIVERATOR_OTLP_ENDPOINT: ${VITE_DELIVERATOR_OTLP_ENDPOINT:-http://127.0.0.1:${OTLP_HTTP_PORT:-4318}}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:3000/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/workspace
+      - deliverator-node-modules:/workspace/node_modules
+      - deliverator-pnpm-store:/pnpm/store
+      - ./.deliverator/data:/workspace/.deliverator/data
+      - ./.deliverator/worktrees:/workspace/.deliverator/worktrees
+      - ./.deliverator/logs:/workspace/.deliverator/logs
+    develop:
+      watch:
+        - action: rebuild
+          path: ./package.json
+        - action: rebuild
+          path: ./pnpm-workspace.yaml
+        - action: rebuild
+          path: ./pnpm-lock.yaml
+        - action: rebuild
+          path: ./Dockerfile.dev
+        - action: rebuild
+          path: ./apps/server/package.json
+        - action: rebuild
+          path: ./packages/contracts/package.json
+        - action: rebuild
+          path: ./packages/shared/package.json
+        - action: rebuild
+          path: ./packages/core/package.json
+        - action: rebuild
+          path: ./packages/db/package.json
+        - action: rebuild
+          path: ./packages/artifacts/package.json
+        - action: rebuild
+          path: ./packages/runner/package.json
+
+volumes:
+  deliverator-node-modules:
+  deliverator-pnpm-store:
