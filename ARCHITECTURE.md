@@ -61,6 +61,20 @@ The control plane decides what is allowed to run and why. The execution plane pe
 - Significant UI/UX work should use the `frontend-design` skill before implementation.
 - Non-trivial changes follow `docs/PLANS.md`, then `openspec/` when required by the change tier.
 
+## Startup Sequence
+
+`apps/server/src/main.ts` boots the server in this order:
+
+1. `resolveRepoRoot()` + `loadAppConfig()` — resolve the repo root and load environment-driven config
+2. `bootstrapTelemetry(config)` — initialize OpenTelemetry
+3. `initializeProductConfig(rootDir)` — scaffold `.deliverator/` with default product config files (workflow, recipes, schemas, prompts, validators) if missing
+4. `openDatabase(config.paths)` + `applyMigrations(dbContext)` — open SQLite and run migrations
+5. `seedDevelopmentState(dbContext, rootDir)` — seed dev data (non-production only)
+6. `loadAndCompileWorkflow(rootDir)` — read and compile `.deliverator/workflow.yaml` into memory
+7. `createApp({ config, dbContext, workflow })` — create the Fastify instance with all routes, then `app.listen()`
+
+Shutdown registers `SIGINT`/`SIGTERM` handlers that close the Fastify app and flush telemetry.
+
 ## Where to Go Deeper
 
 - Knowledge base index: `docs/index.md`

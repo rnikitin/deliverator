@@ -105,6 +105,23 @@ export function getProjects(context: DatabaseContext): Project[] {
     .all() as Project[];
 }
 
+export interface BoardTaskRow {
+  id: string;
+  projectId: string;
+  title: string;
+  stage: string;
+  attentionState: string;
+  summary: string;
+}
+
+export function getAllTasksForBoard(context: DatabaseContext): BoardTaskRow[] {
+  return context.db
+    .prepare(
+      "SELECT id, project_id AS projectId, title, stage, attention_state AS attentionState, summary FROM tasks ORDER BY rowid"
+    )
+    .all() as BoardTaskRow[];
+}
+
 export function getTaskById(context: DatabaseContext, taskId: string): Task | null {
   const row = context.db
     .prepare(

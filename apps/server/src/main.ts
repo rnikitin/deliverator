@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
 
+import { initializeProductConfig, loadAndCompileWorkflow } from "@deliverator/core";
 import { applyMigrations, openDatabase, seedDevelopmentState } from "@deliverator/db";
 
 import { createApp } from "./app.js";
@@ -14,6 +15,8 @@ async function main(): Promise<void> {
 
   await bootstrapTelemetry(config);
 
+  initializeProductConfig(rootDir);
+
   const dbContext = openDatabase(config.paths);
   applyMigrations(dbContext);
 
@@ -21,7 +24,9 @@ async function main(): Promise<void> {
     seedDevelopmentState(dbContext, rootDir);
   }
 
-  const app = await createApp({ config, dbContext });
+  const workflow = loadAndCompileWorkflow(rootDir);
+
+  const app = await createApp({ config, dbContext, workflow });
 
   const shutdown = async () => {
     await app.close();

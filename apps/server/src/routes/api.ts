@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 
-import type { AppConfig } from "@deliverator/contracts";
+import { ATTENTION_STATES, type AppConfig, type CompiledWorkflow } from "@deliverator/contracts";
 import { buildCompiledConfig } from "@deliverator/core";
-import { readinessSnapshot, type DatabaseContext, getTaskById } from "@deliverator/db";
+import { readinessSnapshot, type DatabaseContext, getAllTasksForBoard, getTaskById } from "@deliverator/db";
 import type { FastifyInstance } from "fastify";
 
 import type { AppMetrics } from "../metrics.js";
@@ -11,6 +11,7 @@ export interface ApiRouteDependencies {
   config: AppConfig;
   dbContext: DatabaseContext;
   metrics: AppMetrics;
+  workflow: CompiledWorkflow;
 }
 
 export async function registerApiRoutes(app: FastifyInstance, dependencies: ApiRouteDependencies): Promise<void> {
@@ -30,7 +31,28 @@ export async function registerApiRoutes(app: FastifyInstance, dependencies: ApiR
   });
 
   app.get("/api/config/compiled", async () => {
-    return buildCompiledConfig(dependencies.config);
+    return buildCompiledConfig(dependencies.config, dependencies.workflow);
+  });
+
+  app.get("/api/board", async () => {
+    const tasks = getAllTasksForBoard(dependencies.dbContext);
+    const { stages, allowedMoves } = dependencies.workflow;
+
+    const columns = stages.map((stage) => ({
+      stageId: stage.id,
+      label: stage.label,
+      tasks: tasks.filter((t) => t.stage === stage.id)
+    }));
+
+    return { columns, allowedMoves };
+  });
+
+  app.get("/api/board/schema", async () => {
+    return {
+      stages: dependencies.workflow.stages,
+      allowedMoves: dependencies.workflow.allowedMoves,
+      attentionStates: ATTENTION_STATES
+    };
   });
 
   app.get("/api/events/stream", async (request, reply) => {

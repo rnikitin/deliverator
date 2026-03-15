@@ -1,7 +1,32 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree -L 4 -I 'node_modules' /Users/rnikitin/dev/deliverator/apps/server 2>/dev/null || find /Users/rnikitin/dev/deliverator/apps/server -type d -not -path '*/node_modules*' -not -path '*/.vite*' | head -30)"
+      "Bash(tree -L 4 -I 'node_modules' /Users/rnikitin/dev/deliverator/apps/server 2>/dev/null || find /Users/rnikitin/dev/deliverator/apps/server -type d -not -path '*/node_modules*' -not -path '*/.vite*' | head -30)",
+      "Bash(pnpm add:*)",
+      "Bash(export PATH=\"$HOME/.local/share/pnpm:$HOME/.corepack/bin:$HOME/.nvm/versions/node/v22.*/bin:/opt/homebrew/bin:/usr/local/bin:$PATH\" && which pnpm && pnpm add yaml --filter @deliverator/core 2>&1 | tail -10)",
+      "Read(//Users/rnikitin/.corepack/**)",
+      "Read(//Users/rnikitin/**)",
+      "Bash(git:*)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && corepack enable pnpm 2>/dev/null && pnpm build 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && pnpm --filter @deliverator/core test 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && cd /Users/rnikitin/dev/deliverator/packages/core && npx vitest run 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && npx vitest run 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && pnpm typecheck 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && cd /Users/rnikitin/dev/deliverator && pnpm typecheck 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && openspec instructions apply --change \"contracts-and-phase-a\" --json 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && cd /Users/rnikitin/dev/deliverator/apps/server && pnpm add tailwindcss @tailwindcss/vite class-variance-authority clsx tailwind-merge lucide-react @tanstack/react-query zustand 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && cd /Users/rnikitin/dev/deliverator && pnpm build 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && cd /Users/rnikitin/dev/deliverator/apps/server && npx vitest run 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && cd /Users/rnikitin/dev/deliverator && pnpm --filter @deliverator/server test 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && cd /Users/rnikitin/dev/deliverator && pnpm rebuild better-sqlite3 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && pnpm --filter @deliverator/server test 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && node -e \"console.log\\(process.version, process.versions.modules\\)\" && npx vitest --version 2>&1)",
+      "Bash(source ~/.nvm/nvm.sh && nvm use 22 && pnpm build && pnpm typecheck 2>&1)",
+      "Bash(make down-all:*)",
+      "Bash(make dev:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(export PATH=\"$HOME/.local/share/pnpm:$HOME/.corepack/bin:$PATH\" && pnpm typecheck 2>&1)",
+      "Bash(mkdir -p /Users/rnikitin/dev/deliverator/openspec/specs && for cap in app-shell board-screen design-system-impl task-detail-screen workflow-contracts technical-foundation; do mkdir -p \"/Users/rnikitin/dev/deliverator/openspec/specs/$cap\" && cp \"/Users/rnikitin/dev/deliverator/openspec/changes/contracts-and-phase-a/specs/$cap/spec.md\" \"/Users/rnikitin/dev/deliverator/openspec/specs/$cap/spec.md\"; echo \"Synced: $cap\"; done)"
     ]
   }
 }

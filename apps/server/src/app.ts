@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { AppConfig } from "@deliverator/contracts";
+import type { AppConfig, CompiledWorkflow } from "@deliverator/contracts";
 import type { DatabaseContext } from "@deliverator/db";
 import FastifyVite from "@fastify/vite";
 import Fastify from "fastify";
@@ -15,6 +15,7 @@ import { registerApiRoutes } from "./routes/api.js";
 interface AppDependencies {
   config: AppConfig;
   dbContext: DatabaseContext;
+  workflow: CompiledWorkflow;
 }
 
 type ViteReadyInstance = FastifyInstance & {
@@ -88,11 +89,18 @@ export async function createApp(dependencies: AppDependencies): Promise<FastifyI
   await registerApiRoutes(app, {
     config: dependencies.config,
     dbContext: dependencies.dbContext,
-    metrics
+    metrics,
+    workflow: dependencies.workflow
   });
 
-  app.get("/", async (_request, reply) => reply.html());
-  app.get("/tasks/:taskId", async (_request, reply) => reply.html());
+  // SPA catch-all — all non-API routes serve index.html for client-side routing
+  app.get("/*", async (request, reply) => {
+    if (request.url.startsWith("/api/")) {
+      reply.code(404);
+      return { ok: false, error: "not_found" };
+    }
+    return reply.html();
+  });
 
   await (app as ViteReadyInstance).vite.ready();
 

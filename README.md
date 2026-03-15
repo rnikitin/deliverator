@@ -18,6 +18,11 @@ The first UI shell is infrastructural. It exists to prove the runtime shape, not
 - Docker with Compose support
 - `corepack`
 
+Expected local toolchain before you start:
+- `node --version` should report Node 22
+- `corepack --version` should work
+- `pnpm --version` should work after Corepack activation
+
 ## Local Development
 
 1. Enable `pnpm` through Corepack:
@@ -29,11 +34,24 @@ The first UI shell is infrastructural. It exists to prove the runtime shape, not
 
        pnpm install
 
+   First successful signal:
+   - the command completes without errors
+   - `node_modules/` and the workspace lockfile state are in sync
+   - `pnpm typecheck` can run from the repo root
+
 3. Start the full stack:
 
        make dev
 
 The setup script creates `.env` from `.env.example` when needed, generates `.deliverator/ports.env`, creates the repo-local `.deliverator/` state tree, starts the application and observability containers, applies database migrations, seeds baseline development data, waits for `/healthz`, and then keeps the stack running in watch mode.
+
+If you want the shortest validation path before entering watch mode, use:
+
+    pnpm typecheck
+    pnpm lint
+    pnpm test
+    make dev-start
+    make smoke-services
 
 Current validation note:
 - the foundation code path has been validated host-run with `pnpm typecheck`, `pnpm lint`, `pnpm test`, HTTP smoke checks, and browser smoke checks
@@ -81,12 +99,15 @@ Core application routes:
       corepack enable
       corepack prepare pnpm@10.10.0 --activate
 
+- If `pnpm` still is not found after activating Corepack, open a new shell and re-run `pnpm --version` before continuing.
+
 - `make dev` requires a running Docker daemon. If Docker is installed but not running, start Docker Desktop or your local daemon first.
 - Expected success signals for `make dev`:
   - `.deliverator/ports.env` is generated
   - `.deliverator/` contains `data`, `worktrees`, `logs`, and `observability` subdirectories
   - `GET /healthz` returns HTTP 200
   - Grafana, Prometheus, Loki, and Tempo are reachable on the ports written to `.deliverator/ports.env`
+- OpenSpec commands may print PostHog flush errors for `edge.openspec.dev` when telemetry egress is blocked. If `openspec list` or `openspec validate` still report success, treat that DNS/flush output as telemetry noise rather than a repo failure.
 
 ## Repository Layout
 

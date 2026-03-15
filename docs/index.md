@@ -23,6 +23,7 @@ Start here:
 | Build order and implementation phases | `docs/research/docs/12-mvp-and-build-order.md` |
 | Intended codebase layout | `docs/research/docs/15-codebase-layout.md` |
 | Design system and visual language | `docs/DESIGN_SYSTEM.md` |
+| App structure and screen architecture | `docs/APP_STRUCTURE.md` |
 
 ## Operating Rules
 

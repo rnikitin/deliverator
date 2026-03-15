@@ -1,28 +1,14 @@
-import type { AppConfig, AttentionState, CompiledConfig, Project, Stage, Task, WorkflowStage } from "@deliverator/contracts";
+import type { AppConfig, CompiledConfig, CompiledWorkflow, Project, Task } from "@deliverator/contracts";
 import { timestampNow } from "@deliverator/shared";
 
-const workflowStages: WorkflowStage[] = [
-  { id: "triage", label: "Triage", attentionState: "normal" },
-  { id: "ready", label: "Ready", attentionState: "normal" },
-  { id: "in_progress", label: "In Progress", attentionState: "normal" },
-  { id: "review", label: "Review", attentionState: "needs_human" },
-  { id: "blocked", label: "Blocked", attentionState: "waiting_on_dependency" },
-  { id: "done", label: "Done", attentionState: "normal" }
-];
+export { compileWorkflowYaml, loadAndCompileWorkflow } from "./workflow.js";
+export { initializeProductConfig } from "./init.js";
 
-export function getWorkflowStages(): WorkflowStage[] {
-  return workflowStages;
-}
-
-export function getAttentionStateForStage(stage: Stage): AttentionState {
-  return workflowStages.find((entry) => entry.id === stage)?.attentionState || "normal";
-}
-
-export function buildCompiledConfig(app: AppConfig): CompiledConfig {
+export function buildCompiledConfig(app: AppConfig, workflow: CompiledWorkflow): CompiledConfig {
   return {
     generatedAt: timestampNow(),
     app,
-    stages: getWorkflowStages(),
+    workflow,
     operatorShell: {
       title: "DELIVERATOR",
       subtitle: "Deterministic workflow orchestration for AI CLI agents"
@@ -45,9 +31,57 @@ export function listInitialTasks(projectId: string): Task[] {
       id: "task-foundation",
       projectId,
       title: "Initialize the technical foundation",
-      stage: "in_progress",
-      attentionState: "normal",
+      stage: "build_test",
+      attentionState: "actively_working",
       summary: "Bootstrap the monorepo, local stack, and observability baseline."
+    },
+    {
+      id: "task-design-system",
+      projectId,
+      title: "Implement the design system",
+      stage: "research",
+      attentionState: "awaiting_human_approval",
+      summary: "Set up Tailwind, shadcn/ui, and design tokens from DESIGN_SYSTEM.md."
+    },
+    {
+      id: "task-board-ui",
+      projectId,
+      title: "Build the kanban board",
+      stage: "inbox",
+      attentionState: "paused_for_human",
+      summary: "Create the primary operating surface with 7 stage columns."
+    },
+    {
+      id: "task-workflow-engine",
+      projectId,
+      title: "Implement workflow state machine",
+      stage: "discovery",
+      attentionState: "actively_working",
+      summary: "Build the deterministic stage transition engine with gate support."
+    },
+    {
+      id: "task-artifact-indexer",
+      projectId,
+      title: "Build artifact indexer",
+      stage: "inbox",
+      attentionState: "paused_for_human",
+      summary: "Index and serve immutable run evidence and canonical artifacts."
+    },
+    {
+      id: "task-runner-mvp",
+      projectId,
+      title: "Runner MVP — execute agent actions",
+      stage: "feedback",
+      attentionState: "awaiting_human_input",
+      summary: "Invoke CLI agents via subprocess with workspace isolation."
+    },
+    {
+      id: "task-deploy-pipeline",
+      projectId,
+      title: "Deploy pipeline for completed tasks",
+      stage: "done",
+      attentionState: "ready_to_archive",
+      summary: "Merge PR, cleanup worktree, archive evidence."
     }
   ];
 }

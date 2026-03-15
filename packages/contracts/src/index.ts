@@ -6,20 +6,16 @@ const ajv = new Ajv({
   removeAdditional: false
 });
 
-const StageSchema = Type.Union([
-  Type.Literal("triage"),
-  Type.Literal("ready"),
-  Type.Literal("in_progress"),
-  Type.Literal("review"),
-  Type.Literal("blocked"),
-  Type.Literal("done")
-]);
+const StageSchema = Type.String();
 
 const AttentionStateSchema = Type.Union([
-  Type.Literal("normal"),
-  Type.Literal("needs_human"),
-  Type.Literal("waiting_on_dependency"),
-  Type.Literal("failed")
+  Type.Literal("actively_working"),
+  Type.Literal("awaiting_human_input"),
+  Type.Literal("awaiting_human_approval"),
+  Type.Literal("blocked"),
+  Type.Literal("ready_for_feedback"),
+  Type.Literal("ready_to_archive"),
+  Type.Literal("paused_for_human")
 ]);
 
 const PathsConfigSchema = Type.Object({
@@ -176,10 +172,21 @@ const SseEventSchema = Type.Object({
   data: Type.Record(Type.String(), Type.Union([Type.String(), Type.Number(), Type.Boolean()]))
 });
 
+const CompiledStageSchema = Type.Object({
+  id: Type.String(),
+  label: Type.String(),
+  mode: Type.Union([Type.Literal("manual"), Type.Literal("automatic"), Type.Literal("hybrid")])
+});
+
+const CompiledWorkflowSchema = Type.Object({
+  stages: Type.Array(CompiledStageSchema),
+  allowedMoves: Type.Record(Type.String(), Type.Array(Type.String()))
+});
+
 const CompiledConfigSchema = Type.Object({
   generatedAt: Type.String(),
   app: AppConfigSchema,
-  stages: Type.Array(WorkflowStageSchema),
+  workflow: CompiledWorkflowSchema,
   operatorShell: Type.Object({
     title: Type.String(),
     subtitle: Type.String()
@@ -191,6 +198,8 @@ export type AttentionState = Static<typeof AttentionStateSchema>;
 export type PathsConfig = Static<typeof PathsConfigSchema>;
 export type TelemetryConfig = Static<typeof TelemetryConfigSchema>;
 export type WorkflowStage = Static<typeof WorkflowStageSchema>;
+export type CompiledStage = Static<typeof CompiledStageSchema>;
+export type CompiledWorkflow = Static<typeof CompiledWorkflowSchema>;
 export type AppConfig = Static<typeof AppConfigSchema>;
 export type Project = Static<typeof ProjectSchema>;
 export type Task = Static<typeof TaskSchema>;
@@ -218,6 +227,8 @@ export {
   AttentionStateSchema,
   CommentSchema,
   CompiledConfigSchema,
+  CompiledStageSchema,
+  CompiledWorkflowSchema,
   InvocationBundleSchema,
   PathsConfigSchema,
   ProjectSchema,
@@ -231,6 +242,16 @@ export {
   WorkflowStageSchema,
   WorkspaceSchema
 };
+
+export const ATTENTION_STATES = [
+  { id: "actively_working" as const, label: "Working" },
+  { id: "awaiting_human_input" as const, label: "Needs Input" },
+  { id: "awaiting_human_approval" as const, label: "Needs Approval" },
+  { id: "blocked" as const, label: "Blocked" },
+  { id: "ready_for_feedback" as const, label: "Ready for Review" },
+  { id: "ready_to_archive" as const, label: "Archive" },
+  { id: "paused_for_human" as const, label: "Paused" }
+] satisfies ReadonlyArray<{ id: AttentionState; label: string }>;
 
 export function validateSchema<T extends TSchema>(schema: T, value: unknown): value is Static<T> {
   const validator = ajv.compile(schema);

@@ -75,6 +75,8 @@ Start with:
 - `openspec/project.md`
 - the repo's checked-in OpenSpec workflows
 
+Once an OpenSpec change is fully implemented and validated, archive it as the final closeout step instead of leaving it in the active change list.
+
 ## UI and UX Planning
 
 For substantial UI or UX work, use the `frontend-design` skill before implementation.
@@ -95,3 +97,9 @@ For any implemented change:
 - keep `AGENTS.md` and `CLAUDE.md` aligned if root policy changed
 - update `openspec/project.md` when repo-wide conventions change
 - add or revise deeper docs only where they are the natural source of truth
+
+## OpenSpec CLI Notes
+
+- `openspec list` and `openspec validate` may emit PostHog flush errors for `edge.openspec.dev` when outbound telemetry is unavailable.
+- Treat those messages as external telemetry noise if the command itself still reports a successful result.
+- Do not confuse telemetry flush failures with spec validation failures.

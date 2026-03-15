@@ -45,6 +45,8 @@ For Tier 2:
 
 If scope grows during discovery, promote the work to the next tier and record that decision in the planning artifacts.
 
+If a Tier 2 OpenSpec change reaches complete, validated state, archive it as the final closeout step instead of leaving it active in `openspec list`.
+
 ## Validation Expectations
 
 Before calling a change done, run the smallest meaningful validation set for the scope. Common commands from the repo root are:
@@ -63,6 +65,10 @@ Validation should be stated in observable terms:
 - an artifact or log entry is produced in the expected place
 
 If full automation is not available, document the remaining validation gap explicitly instead of hand-waving it away.
+
+OpenSpec CLI note:
+- `openspec list` and `openspec validate` may emit PostHog flush errors for `edge.openspec.dev` when telemetry egress is blocked.
+- If the command still reports success, treat that output as telemetry noise rather than a spec failure.
 
 ## Architecture and Code Expectations
 
