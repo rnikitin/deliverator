@@ -56,6 +56,7 @@ If you want the shortest validation path before entering watch mode, use:
 Current validation note:
 - the foundation code path has been validated host-run with `pnpm typecheck`, `pnpm lint`, `pnpm test`, HTTP smoke checks, and browser smoke checks
 - the Docker-backed dev flow has also been validated with `make dev-start` and `make smoke-services` in an environment with a working local Docker daemon
+- GitHub Actions runs `pnpm typecheck`, `pnpm lint`, and `pnpm test` on push and pull request; Docker-backed smoke is kept in a separate manual/nightly workflow instead of blocking every contribution
 
 ## Useful Commands
 

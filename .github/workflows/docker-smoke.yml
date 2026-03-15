@@ -1,0 +1,27 @@
+name: Docker Smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+  docker-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Docker
+        run: docker version
+
+      - name: Start dev stack
+        run: make dev-start
+
+      - name: Smoke-test services
+        run: make smoke-services
+
+      - name: Stop dev stack
+        if: always()
+        run: make down
