@@ -1,0 +1,15 @@
+recipe_id: feedback.apply
+kind: mutation_recipe
+description: Apply human feedback to the current task workspace.
+
+actions:
+  - kind: agent.run
+    uses: claude_cli
+    with:
+      system_prompt_file: .deliverator/prompts/feedback/apply.system.md
+  - kind: tests.unit.run
+    uses: project_commands
+
+outputs:
+  - path: artifacts/current/feedback_delta.md
+    kind: feedback_delta

@@ -1,0 +1,26 @@
+recipe_id: discovery.questions
+kind: artifact_recipe
+description: Research the repo and task description, then produce a concise list of clarifying questions.
+
+actions:
+  - kind: agent.run
+    uses: claude_cli
+    with:
+      system_prompt_file: .deliverator/prompts/discovery/questions.system.md
+      output_schema: .deliverator/schemas/action-result.schema.json
+
+inputs:
+  - task.title
+  - task.description
+  - task.comments.all
+  - task.attachments.all
+  - repo.directory_map
+  - repo.key_files
+
+outputs:
+  - path: artifacts/current/discovery_questions.md
+    kind: discovery_questions
+
+validators:
+  - markdown_exists
+  - non_empty_output

@@ -1,35 +1,38 @@
 import { useCallback, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 import { cn } from "../lib/utils.js";
+import { STAGE_HEADER_COLORS } from "../lib/board-styles.js";
 import { useBoard } from "../hooks/use-board.js";
+import { buildTaskOverlaySearch, clearTaskOverlaySearch, readTaskOverlay } from "../lib/task-overlay.js";
 import { BoardCard } from "./board-card.js";
-import { TaskSidebar } from "./task-sidebar.js";
-
-const STAGE_COLORS: Record<string, string> = {
-  inbox: "border-b-stage-inbox",
-  discovery: "border-b-stage-discovery",
-  research: "border-b-stage-research",
-  build_test: "border-b-stage-build",
-  feedback: "border-b-stage-feedback",
-  deploy: "border-b-stage-deploy",
-  done: "border-b-stage-done"
-};
 
 export function Board() {
-  const { data, isLoading, error } = useBoard();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams<{ projectSlug: string }>();
+  const projectSlug = params.projectSlug || "";
+  const taskOverlay = readTaskOverlay(location.search);
+  const selectedTaskId = taskOverlay.projectSlug === projectSlug ? taskOverlay.taskId : null;
+  const { data, isLoading, error } = useBoard(projectSlug);
   const [doneExpanded, setDoneExpanded] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const selectTask = useCallback((taskId: string | null) => {
-    setSelectedTaskId(taskId);
+    if (!projectSlug) return;
+    navigate({
+      pathname: `/projects/${projectSlug}/board`,
+      search: taskId
+        ? buildTaskOverlaySearch(location.search, projectSlug, taskId)
+        : clearTaskOverlaySearch(location.search)
+    });
     if (!taskId || !scrollRef.current) return;
 
     // After state update, scroll the card into the visible (non-covered) area
     requestAnimationFrame(() => {
       const container = scrollRef.current;
       if (!container) return;
-      const card = container.querySelector(`[data-task-id="${taskId}"]`);
+      const card = container.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
       if (!card) return;
 
       const cardRect = card.getBoundingClientRect();
@@ -48,7 +51,15 @@ export function Board() {
         container.scrollBy({ left: scrollBy, behavior: "smooth" });
       }
     });
-  }, []);
+  }, [location.search, navigate, projectSlug]);
+
+  if (!projectSlug) {
+    return (
+      <div className="flex h-full items-center justify-center p-8">
+        <p className="font-mono text-sm text-muted-foreground">Select a project to view its board.</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -71,8 +82,6 @@ export function Board() {
   if (!data) return null;
 
   return (
-    <>
-      {/* Scroll container */}
       <div ref={scrollRef} className="h-[calc(100vh-40px)] overflow-x-auto">
         <div
           className="flex h-full"
@@ -83,7 +92,7 @@ export function Board() {
             {data.columns.map((column) => {
               const isDone = column.stageId === "done";
               const collapsed = isDone && !doneExpanded;
-              const borderClass = STAGE_COLORS[column.stageId] ?? "border-b-border";
+              const borderClass = STAGE_HEADER_COLORS[column.stageId] ?? "border-b-border";
 
               return (
                 <div
@@ -151,14 +160,5 @@ export function Board() {
           {selectedTaskId && <div className="w-[50vw] shrink-0" />}
         </div>
       </div>
-
-      {/* Task sidebar — fixed overlay on right */}
-      {selectedTaskId && (
-        <TaskSidebar
-          taskId={selectedTaskId}
-          onClose={() => setSelectedTaskId(null)}
-        />
-      )}
-    </>
   );
 }

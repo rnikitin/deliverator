@@ -1,0 +1,42 @@
+recipe_id: build.loop
+kind: loop_recipe
+description: Implement the next OpenSpec slice, test it, review it, and simplify it.
+
+actions:
+  - kind: agent.run
+    uses: codex_cli
+    with:
+      system_prompt_file: .deliverator/prompts/build/implement.system.md
+  - kind: agent.run
+    uses: claude_cli
+    with:
+      system_prompt_file: .deliverator/prompts/build/tests_and_fixes.system.md
+  - kind: tests.unit.run
+    uses: project_commands
+  - kind: tests.integration.run
+    uses: project_commands
+  - kind: tests.e2e.run
+    uses: project_commands
+  - kind: agent.run
+    uses: claude_cli
+    with:
+      system_prompt_file: .deliverator/prompts/build/review.system.md
+  - kind: agent.run
+    uses: codex_cli
+    with:
+      system_prompt_file: .deliverator/prompts/build/review_fix.system.md
+  - kind: agent.run
+    uses: claude_cli
+    with:
+      system_prompt_file: .deliverator/prompts/build/simplify.system.md
+      repeat: 2
+  - kind: openspec.refresh_status
+    uses: openspec_cli
+
+outputs:
+  - path: artifacts/current/build_report.md
+    kind: build_report
+  - path: artifacts/current/test_report.json
+    kind: test_report
+  - path: artifacts/current/review_report.md
+    kind: review_report

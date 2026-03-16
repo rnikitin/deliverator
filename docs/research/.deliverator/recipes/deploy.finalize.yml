@@ -1,0 +1,19 @@
+recipe_id: deploy.finalize
+kind: deployment_recipe
+description: Rebase/merge the task branch, run deploy commands, and finalize SCM state.
+
+actions:
+  - kind: scm.rebase_on_main
+    uses: github_cli
+  - kind: scm.resolve_conflicts_attempt
+    uses: codex_cli
+  - kind: scm.pr.merge
+    uses: github_cli
+  - kind: runtime.post_deploy_commands
+    uses: project_commands
+  - kind: scm.pr.close_if_required
+    uses: github_cli
+
+outputs:
+  - path: artifacts/current/deploy_report.md
+    kind: deploy_report

@@ -26,7 +26,18 @@
       "Bash(make dev:*)",
       "Bash(pnpm typecheck:*)",
       "Bash(export PATH=\"$HOME/.local/share/pnpm:$HOME/.corepack/bin:$PATH\" && pnpm typecheck 2>&1)",
-      "Bash(mkdir -p /Users/rnikitin/dev/deliverator/openspec/specs && for cap in app-shell board-screen design-system-impl task-detail-screen workflow-contracts technical-foundation; do mkdir -p \"/Users/rnikitin/dev/deliverator/openspec/specs/$cap\" && cp \"/Users/rnikitin/dev/deliverator/openspec/changes/contracts-and-phase-a/specs/$cap/spec.md\" \"/Users/rnikitin/dev/deliverator/openspec/specs/$cap/spec.md\"; echo \"Synced: $cap\"; done)"
+      "Bash(mkdir -p /Users/rnikitin/dev/deliverator/openspec/specs && for cap in app-shell board-screen design-system-impl task-detail-screen workflow-contracts technical-foundation; do mkdir -p \"/Users/rnikitin/dev/deliverator/openspec/specs/$cap\" && cp \"/Users/rnikitin/dev/deliverator/openspec/changes/contracts-and-phase-a/specs/$cap/spec.md\" \"/Users/rnikitin/dev/deliverator/openspec/specs/$cap/spec.md\"; echo \"Synced: $cap\"; done)",
+      "Bash(which pnpm:*)",
+      "Read(//usr/local/**)",
+      "Read(//opt/**)",
+      "Bash(export PATH=\"/Users/rnikitin/.nvm/versions/node/v22.22.0/bin:$PATH\" && pnpm typecheck 2>&1 | tail -30)",
+      "Bash(/Users/rnikitin/.nvm/versions/node/v22.22.0/bin/pnpm typecheck:*)",
+      "Bash(/Users/rnikitin/.nvm/versions/node/v22.22.0/bin/npx tsc:*)",
+      "Bash(/Users/rnikitin/.nvm/versions/node/v22.22.0/bin/npx vitest:*)",
+      "Bash(find /Users/rnikitin/dev/deliverator/apps/server -name \"*.css\" -o -name \"tailwind.config.*\" -o -name \"globals.css\" 2>/dev/null | head -20)",
+      "Bash(bun run:*)",
+      "Bash(bun add:*)",
+      "Bash(git diff:*)"
     ]
   }
 }

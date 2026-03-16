@@ -2,9 +2,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+import { resolveProjectPaths } from "@deliverator/shared";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { initializeProductConfig } from "../src/index.js";
+import { initializeProjectConfig } from "../src/index.js";
 
 const createdDirs: string[] = [];
 
@@ -14,15 +15,16 @@ afterEach(() => {
   }
 });
 
-describe("initializeProductConfig", () => {
+describe("initializeProjectConfig", () => {
   it("creates all default product config files", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "deliverator-init-"));
     createdDirs.push(tempDir);
 
-    initializeProductConfig(tempDir);
+    initializeProjectConfig(resolveProjectPaths(tempDir), "Example Repo", "example-repo");
 
-    const base = path.join(tempDir, ".deliverator");
+    const base = path.join(tempDir, ".deliverator", "shared");
     expect(fs.existsSync(path.join(base, "workflow.yaml"))).toBe(true);
+    expect(fs.existsSync(path.join(base, "project.yaml"))).toBe(true);
     expect(fs.existsSync(path.join(base, "recipes", "build.loop.yml"))).toBe(true);
     expect(fs.existsSync(path.join(base, "recipes", "deploy.finalize.yml"))).toBe(true);
     expect(fs.existsSync(path.join(base, "recipes", "discovery.questions.yml"))).toBe(true);
@@ -51,12 +53,12 @@ describe("initializeProductConfig", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "deliverator-init-"));
     createdDirs.push(tempDir);
 
-    const base = path.join(tempDir, ".deliverator");
+    const base = path.join(tempDir, ".deliverator", "shared");
     fs.mkdirSync(base, { recursive: true });
     const customContent = "# My custom workflow\nversion: 99\n";
     fs.writeFileSync(path.join(base, "workflow.yaml"), customContent, "utf8");
 
-    initializeProductConfig(tempDir);
+    initializeProjectConfig(tempDir);
 
     const afterInit = fs.readFileSync(path.join(base, "workflow.yaml"), "utf8");
     expect(afterInit).toBe(customContent);
@@ -69,15 +71,15 @@ describe("initializeProductConfig", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "deliverator-init-"));
     createdDirs.push(tempDir);
 
-    initializeProductConfig(tempDir);
+    initializeProjectConfig(tempDir);
     const firstContent = fs.readFileSync(
-      path.join(tempDir, ".deliverator", "workflow.yaml"),
+      path.join(tempDir, ".deliverator", "shared", "workflow.yaml"),
       "utf8"
     );
 
-    initializeProductConfig(tempDir);
+    initializeProjectConfig(tempDir);
     const secondContent = fs.readFileSync(
-      path.join(tempDir, ".deliverator", "workflow.yaml"),
+      path.join(tempDir, ".deliverator", "shared", "workflow.yaml"),
       "utf8"
     );
 
@@ -88,11 +90,11 @@ describe("initializeProductConfig", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "deliverator-init-"));
     createdDirs.push(tempDir);
 
-    initializeProductConfig(tempDir);
+    initializeProjectConfig(tempDir);
 
     const { compileWorkflowYaml } = await import("../src/workflow.js");
     const content = fs.readFileSync(
-      path.join(tempDir, ".deliverator", "workflow.yaml"),
+      path.join(tempDir, ".deliverator", "shared", "workflow.yaml"),
       "utf8"
     );
     const workflow = compileWorkflowYaml(content);
@@ -106,9 +108,9 @@ describe("initializeProductConfig", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "deliverator-init-"));
     createdDirs.push(tempDir);
 
-    initializeProductConfig(tempDir);
+    initializeProjectConfig(tempDir);
 
-    const schemasDir = path.join(tempDir, ".deliverator", "schemas");
+    const schemasDir = path.join(tempDir, ".deliverator", "shared", "schemas");
     const schemaFiles = fs.readdirSync(schemasDir);
 
     expect(schemaFiles.length).toBe(5);
@@ -116,5 +118,16 @@ describe("initializeProductConfig", () => {
       const content = fs.readFileSync(path.join(schemasDir, file), "utf8");
       expect(() => JSON.parse(content)).not.toThrow();
     }
+  });
+
+  it("writes project metadata using the provided identity", () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "deliverator-init-"));
+    createdDirs.push(tempDir);
+
+    initializeProjectConfig(tempDir, "Acme App", "acme-app");
+
+    const projectYaml = fs.readFileSync(path.join(tempDir, ".deliverator", "shared", "project.yaml"), "utf8");
+    expect(projectYaml).toContain("name: Acme App");
+    expect(projectYaml).toContain("slug: acme-app");
   });
 });

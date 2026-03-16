@@ -1,22 +1,36 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { ensureDirectory } from "@deliverator/shared";
+import {
+  deriveProjectName,
+  deriveProjectSlug,
+  ensureDirectory,
+  resolveProjectPaths,
+  type ProjectPaths
+} from "@deliverator/shared";
 
-import { DEFAULT_PRODUCT_FILES } from "./defaults.js";
+import { DEFAULT_PRODUCT_FILES, buildDefaultProjectYaml } from "./defaults.js";
 
 /**
- * Initialize the `.deliverator/` product configuration directory.
+ * Initialize the `<project>/.deliverator/shared/` configuration directory.
  *
- * Creates all default product config files (workflow, recipes, schemas,
+ * Creates all default project config files (workflow, recipes, schemas,
  * prompts, validators) if they do not already exist. Existing files are
  * never overwritten — operators can customise them freely.
  *
  * Call this at startup before workflow compilation or any other init that
- * reads from `.deliverator/`.
+ * reads from the shared project tree.
  */
-export function initializeProductConfig(repoRoot: string): void {
-  const baseDir = path.join(repoRoot, ".deliverator");
+export function initializeProjectConfig(
+  input: string | ProjectPaths,
+  explicitName?: string,
+  explicitSlug?: string
+): ProjectPaths {
+  const projectPaths = typeof input === "string" ? resolveProjectPaths(input) : input;
+  const projectName = deriveProjectName(projectPaths.rootPath, explicitName);
+  const projectSlug = explicitSlug || deriveProjectSlug(projectPaths.rootPath, explicitName);
+  const baseDir = projectPaths.sharedDir;
+
   ensureDirectory(baseDir);
 
   for (const entry of DEFAULT_PRODUCT_FILES) {
@@ -27,6 +41,12 @@ export function initializeProductConfig(repoRoot: string): void {
     }
 
     ensureDirectory(path.dirname(targetPath));
-    fs.writeFileSync(targetPath, entry.content, "utf8");
+    const content =
+      entry.path === "project.yaml" ? buildDefaultProjectYaml(projectName, projectSlug) : entry.content;
+    fs.writeFileSync(targetPath, content, "utf8");
   }
+
+  return projectPaths;
 }
+
+export const initializeProductConfig = initializeProjectConfig;

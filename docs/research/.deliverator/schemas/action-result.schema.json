@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deliverator.dev/schemas/action-result.schema.json",
+  "title": "ActionResult",
+  "type": "object",
+  "required": [
+    "status",
+    "decision",
+    "summary",
+    "artifacts"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failed_retryable",
+        "failed_terminal",
+        "blocked",
+        "cancelled"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "continue",
+        "repeat",
+        "human_handoff",
+        "blocked",
+        "advance",
+        "stop"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "structured_output": {
+      "type": [
+        "object",
+        "array",
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
+    },
+    "validator_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "passed"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

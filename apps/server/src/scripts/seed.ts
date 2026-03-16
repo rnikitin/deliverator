@@ -1,10 +1,13 @@
-import { openDatabase, seedDevelopmentState } from "@deliverator/db";
+import { loadAppConfig, resolveWorkspaceRoot } from "../config.js";
+import { ProjectRegistryManager } from "../project-manager.js";
 
-import { loadAppConfig, resolveRepoRoot } from "../config.js";
+const config = loadAppConfig(process.env);
+const manager = new ProjectRegistryManager(config, resolveWorkspaceRoot());
+const result = manager.registerProject({
+  rootPath: resolveWorkspaceRoot(),
+  name: "Deliverator Workspace"
+});
 
-const rootDir = resolveRepoRoot();
-const config = loadAppConfig(rootDir, process.env);
-const dbContext = openDatabase(config.paths);
-const result = seedDevelopmentState(dbContext, rootDir);
+process.stdout.write(`Prepared project ${result.project.slug} at ${result.project.rootPath}.\n`);
 
-process.stdout.write(`Seeded ${result.insertedProjects} project(s) and ${result.insertedTasks} task(s).\n`);
+manager.close();

@@ -1,14 +1,8 @@
 /**
- * Default product configuration files for the .deliverator/ directory.
+ * Default project configuration files for `<project>/.deliverator/shared/`.
  *
  * These are written at first startup if missing. Operators can then
  * customise them in place — DELIVERATOR never overwrites existing files.
- *
- * Content mirrors `docs/research/.deliverator/` (the reference material).
- * To update defaults when the research reference changes, edit the
- * string constants in this file and verify with `pnpm test` in
- * packages/core. Existing user files in `.deliverator/` are never
- * overwritten — only missing files are created at startup.
  */
 
 // ---------------------------------------------------------------------------
@@ -98,11 +92,6 @@ stages:
   build_test:
     title: Build&Test
     mode: automated
-    entry_actions:
-      - kind: runtime.dev.up
-        uses: docker_compose
-      - kind: runtime.observability.up
-        uses: docker_compose
     loop:
       max_iterations: 12
       max_no_progress_iterations: 2
@@ -177,11 +166,11 @@ actions:
   - kind: agent.run
     uses: codex_cli
     with:
-      system_prompt_file: .deliverator/prompts/build/implement.system.md
+      system_prompt_file: .deliverator/shared/prompts/build/implement.system.md
   - kind: agent.run
     uses: claude_cli
     with:
-      system_prompt_file: .deliverator/prompts/build/tests_and_fixes.system.md
+      system_prompt_file: .deliverator/shared/prompts/build/tests_and_fixes.system.md
   - kind: tests.unit.run
     uses: project_commands
   - kind: tests.integration.run
@@ -191,15 +180,15 @@ actions:
   - kind: agent.run
     uses: claude_cli
     with:
-      system_prompt_file: .deliverator/prompts/build/review.system.md
+      system_prompt_file: .deliverator/shared/prompts/build/review.system.md
   - kind: agent.run
     uses: codex_cli
     with:
-      system_prompt_file: .deliverator/prompts/build/review_fix.system.md
+      system_prompt_file: .deliverator/shared/prompts/build/review_fix.system.md
   - kind: agent.run
     uses: claude_cli
     with:
-      system_prompt_file: .deliverator/prompts/build/simplify.system.md
+      system_prompt_file: .deliverator/shared/prompts/build/simplify.system.md
       repeat: 2
   - kind: openspec.refresh_status
     uses: openspec_cli
@@ -242,8 +231,8 @@ actions:
   - kind: agent.run
     uses: claude_cli
     with:
-      system_prompt_file: .deliverator/prompts/discovery/questions.system.md
-      output_schema: .deliverator/schemas/action-result.schema.json
+      system_prompt_file: .deliverator/shared/prompts/discovery/questions.system.md
+      output_schema: .deliverator/shared/schemas/action-result.schema.json
 
 inputs:
   - task.title
@@ -270,7 +259,7 @@ actions:
   - kind: agent.run
     uses: claude_cli
     with:
-      system_prompt_file: .deliverator/prompts/feedback/apply.system.md
+      system_prompt_file: .deliverator/shared/prompts/feedback/apply.system.md
   - kind: tests.unit.run
     uses: project_commands
 
@@ -286,16 +275,16 @@ description: Produce or revise the canonical ExecPlan artifact for the task.
 resolver:
   mode: personalizable
   candidates:
-    - repo://.deliverator/recipes/research.execplan.yml
+    - repo://.deliverator/shared/recipes/research.execplan.yml
     - profile://recipes/research.execplan.yml
 
 actions:
   - kind: agent.run
     uses: claude_cli
     with:
-      system_prompt_file: .deliverator/prompts/research/execplan.system.md
+      system_prompt_file: .deliverator/shared/prompts/research/execplan.system.md
       skill_ref: profile://execplan/default
-      output_schema: .deliverator/schemas/action-result.schema.json
+      output_schema: .deliverator/shared/schemas/action-result.schema.json
 
 inputs:
   - task.title
@@ -323,8 +312,8 @@ actions:
   - kind: agent.run
     uses: codex_cli
     with:
-      system_prompt_file: .deliverator/prompts/research/openspec.system.md
-      output_schema: .deliverator/schemas/action-result.schema.json
+      system_prompt_file: .deliverator/shared/prompts/research/openspec.system.md
+      output_schema: .deliverator/shared/schemas/action-result.schema.json
 
 inputs:
   - task.title
@@ -713,13 +702,21 @@ The BuildTest stage should only auto-complete when:
 If no progress is made across repeated iterations, the stage must stop and request human input.
 `;
 
+export function buildDefaultProjectYaml(projectName: string, projectSlug: string): string {
+  return `version: 1
+name: ${projectName}
+slug: ${projectSlug}
+`;
+}
+
 // ---------------------------------------------------------------------------
-// File manifest — relative paths under .deliverator/
+// File manifest — relative paths under `<project>/.deliverator/shared/`
 // ---------------------------------------------------------------------------
 
 export const DEFAULT_PRODUCT_FILES: ReadonlyArray<{ path: string; content: string }> = [
   // Workflow
   { path: "workflow.yaml", content: DEFAULT_WORKFLOW_YAML },
+  { path: "project.yaml", content: buildDefaultProjectYaml("Project", "project") },
 
   // Recipes
   { path: "recipes/build.loop.yml", content: RECIPE_BUILD_LOOP },

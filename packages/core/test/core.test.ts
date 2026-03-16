@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { buildCompiledConfig, compileWorkflowYaml, createBootstrapProject, listInitialTasks } from "../src/index.js";
+import {
+  buildCompiledConfig,
+  compileWorkflowYaml,
+  createBootstrapProject,
+  createRegisteredProject,
+  listInitialTasks
+} from "../src/index.js";
 
 const testWorkflow = compileWorkflowYaml(`
 version: 1
@@ -29,18 +35,18 @@ describe("core", () => {
       {
         nodeEnv: "development",
         port: 3000,
-        paths: {
-          dataDir: "/tmp/data",
-          worktreeDir: "/tmp/worktrees",
-          logsDir: "/tmp/logs"
-        },
-        telemetry: {
-          serviceName: "deliverator-server",
-          otlpEndpoint: "http://localhost:4318",
-          browserTracingEnabled: true,
-          metricsPath: "/api/metrics"
+        serviceName: "deliverator-server",
+        globalPaths: {
+          homeDir: "/tmp/home/.deliverator",
+          dataDir: "/tmp/home/.deliverator/data",
+          logsDir: "/tmp/home/.deliverator/logs",
+          runDir: "/tmp/home/.deliverator/run",
+          registryDbPath: "/tmp/home/.deliverator/data/registry.db",
+          runtimeStatePath: "/tmp/home/.deliverator/run/current.json",
+          appLogFilePath: "/tmp/home/.deliverator/logs/app.jsonl"
         }
       },
+      createRegisteredProject("/tmp/repo", "Example Repo"),
       testWorkflow
     );
 
@@ -51,13 +57,14 @@ describe("core", () => {
   });
 
   it("derives bootstrap records with valid stage and attention values", () => {
-    const project = createBootstrapProject("/tmp/repo");
+    const project = createBootstrapProject("/tmp/repo", "Example Repo");
     const tasks = listInitialTasks(project.id);
 
     expect(tasks.length).toBeGreaterThan(1);
     expect(tasks[0]?.projectId).toBe(project.id);
     expect(tasks[0]?.stage).toBe("build_test");
     expect(tasks[0]?.attentionState).toBe("actively_working");
+    expect(project.slug).toBe("example-repo");
   });
 });
 

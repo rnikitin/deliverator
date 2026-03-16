@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deliverator.dev/schemas/run-manifest.schema.json",
+  "title": "RunManifest",
+  "type": "object",
+  "required": [
+    "run_id",
+    "task_id",
+    "stage",
+    "runtime",
+    "actions"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "stage": {
+      "type": "string"
+    },
+    "trigger": {
+      "type": "string"
+    },
+    "runtime": {
+      "type": "string"
+    },
+    "workspace_path": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "ended_at": {
+      "type": "string"
+    },
+    "resolved_recipes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "recipe_id",
+          "source"
+        ],
+        "properties": {
+          "recipe_id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "action_id",
+          "kind",
+          "adapter"
+        ],
+        "properties": {
+          "action_id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "adapter": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

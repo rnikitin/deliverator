@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deliverator.dev/schemas/stage-result.schema.json",
+  "title": "StageResult",
+  "type": "object",
+  "required": [
+    "stage",
+    "decision",
+    "status"
+  ],
+  "properties": {
+    "stage": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failed_retryable",
+        "failed_terminal",
+        "blocked",
+        "awaiting_human_input",
+        "awaiting_human_approval",
+        "cancelled"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "advance",
+        "repeat",
+        "human_handoff",
+        "blocked",
+        "failed_retryable",
+        "failed_terminal",
+        "stop"
+      ]
+    },
+    "next_stage": {
+      "type": "string"
+    },
+    "artifact_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blocking_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "number",
+          "string",
+          "boolean",
+          "null"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

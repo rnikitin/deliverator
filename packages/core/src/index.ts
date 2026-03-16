@@ -1,13 +1,18 @@
-import type { AppConfig, CompiledConfig, CompiledWorkflow, Project, Task } from "@deliverator/contracts";
-import { timestampNow } from "@deliverator/shared";
+import type { AppConfig, CompiledConfig, CompiledWorkflow, Project, RegisteredProject, Task } from "@deliverator/contracts";
+import { deriveProjectName, deriveProjectSlug, deriveStableId, timestampNow } from "@deliverator/shared";
 
 export { compileWorkflowYaml, loadAndCompileWorkflow } from "./workflow.js";
-export { initializeProductConfig } from "./init.js";
+export { initializeProductConfig, initializeProjectConfig } from "./init.js";
 
-export function buildCompiledConfig(app: AppConfig, workflow: CompiledWorkflow): CompiledConfig {
+export function buildCompiledConfig(
+  app: AppConfig,
+  project: RegisteredProject,
+  workflow: CompiledWorkflow
+): CompiledConfig {
   return {
     generatedAt: timestampNow(),
     app,
+    project,
     workflow,
     operatorShell: {
       title: "DELIVERATOR",
@@ -16,12 +21,25 @@ export function buildCompiledConfig(app: AppConfig, workflow: CompiledWorkflow):
   };
 }
 
-export function createBootstrapProject(rootDir: string): Project {
+export function createBootstrapProject(rootDir: string, explicitName?: string): Project {
+  const name = deriveProjectName(rootDir, explicitName);
+  const slug = deriveProjectSlug(rootDir, explicitName);
   return {
-    id: "project-deliverator",
-    slug: "deliverator",
-    name: "DELIVERATOR",
+    id: deriveStableId("project", rootDir),
+    slug,
+    name,
     repositoryPath: rootDir
+  };
+}
+
+export function createRegisteredProject(rootDir: string, explicitName?: string): RegisteredProject {
+  const project = createBootstrapProject(rootDir, explicitName);
+  return {
+    id: project.id,
+    slug: project.slug,
+    name: project.name,
+    rootPath: rootDir,
+    createdAt: timestampNow()
   };
 }
 
@@ -30,58 +48,58 @@ export function listInitialTasks(projectId: string): Task[] {
     {
       id: "task-foundation",
       projectId,
-      title: "Initialize the technical foundation",
+      title: "Register the first project",
       stage: "build_test",
       attentionState: "actively_working",
-      summary: "Bootstrap the monorepo, local stack, and observability baseline."
+      summary: "Create the per-project Deliverator layout and verify the board loads through the registry."
     },
     {
-      id: "task-design-system",
+      id: "task-workflow-shared",
       projectId,
-      title: "Implement the design system",
+      title: "Review the shared workflow",
       stage: "research",
       attentionState: "awaiting_human_approval",
-      summary: "Set up Tailwind, shadcn/ui, and design tokens from DESIGN_SYSTEM.md."
+      summary: "Customize <project>/.deliverator/shared/workflow.yaml for this repository."
     },
     {
-      id: "task-board-ui",
+      id: "task-board-polish",
       projectId,
-      title: "Build the kanban board",
+      title: "Shape the project board",
       stage: "inbox",
       attentionState: "paused_for_human",
-      summary: "Create the primary operating surface with 7 stage columns."
+      summary: "Tune board columns, summaries, and project-specific context for daily use."
     },
     {
       id: "task-workflow-engine",
       projectId,
-      title: "Implement workflow state machine",
+      title: "Refine workflow automation",
       stage: "discovery",
       attentionState: "actively_working",
-      summary: "Build the deterministic stage transition engine with gate support."
+      summary: "Connect project-scoped actions, recipes, and approvals to the shared workflow."
     },
     {
-      id: "task-artifact-indexer",
+      id: "task-artifact-hygiene",
       projectId,
-      title: "Build artifact indexer",
+      title: "Set artifact retention rules",
       stage: "inbox",
       attentionState: "paused_for_human",
-      summary: "Index and serve immutable run evidence and canonical artifacts."
+      summary: "Define which project artifacts stay in .deliverator/local and which summaries belong in shared state."
     },
     {
-      id: "task-runner-mvp",
+      id: "task-cli-ops",
       projectId,
-      title: "Runner MVP — execute agent actions",
+      title: "Harden the CLI workflow",
       stage: "feedback",
       attentionState: "awaiting_human_input",
-      summary: "Invoke CLI agents via subprocess with workspace isolation."
+      summary: "Validate start/open/logs flows and capture operator feedback on portability."
     },
     {
-      id: "task-deploy-pipeline",
+      id: "task-archive-ready",
       projectId,
-      title: "Deploy pipeline for completed tasks",
+      title: "Archive completed work",
       stage: "done",
       attentionState: "ready_to_archive",
-      summary: "Merge PR, cleanup worktree, archive evidence."
+      summary: "Close finished tasks once artifacts and feedback have been captured."
     }
   ];
 }

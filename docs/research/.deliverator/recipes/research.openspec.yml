@@ -1,0 +1,25 @@
+recipe_id: research.openspec
+kind: artifact_recipe
+description: Produce or revise OpenSpec artifacts for the task.
+
+actions:
+  - kind: agent.run
+    uses: codex_cli
+    with:
+      system_prompt_file: .deliverator/prompts/research/openspec.system.md
+      output_schema: .deliverator/schemas/action-result.schema.json
+
+inputs:
+  - task.title
+  - task.description
+  - task.comments.stage
+  - task.attachments.stage
+  - artifacts/current/execplan.md
+  - repo.context
+
+outputs:
+  - path: openspec/
+    kind: openspec_dir
+
+validators:
+  - openspec_exists

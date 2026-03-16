@@ -10,7 +10,7 @@ const serverRoot = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: path.join(serverRoot, "web"),
-  plugins: [tailwindcss(), viteFastify(), react()],
+  plugins: [tailwindcss(), viteFastify({ spa: true }), react()],
   server: {
     host: "0.0.0.0"
   },

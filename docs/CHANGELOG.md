@@ -14,6 +14,12 @@ Detailed monthly archives can be added later under `docs/changelog/`.
 
 ## Current Month: 2026-03
 
+### 2026-03-16
+- [architecture][runtime][storage] Switched DELIVERATOR to the per-project runtime model: global app state now lives under `~/.deliverator`, while each managed project owns `<project>/.deliverator/shared` and `<project>/.deliverator/local`.
+- [runtime][cli][logs] Added the CLI-first local runtime surface around `deliverator start`, `deliverator open`, and `deliverator logs`, with JSONL logs as the supported local diagnostic path instead of the previous observability stack.
+- [tooling][bun] Moved the workspace to Bun as the package manager and primary command runner. The supported contributor path is now `bun install`, `bun run dev`, `bun run start`, `bun run lint`, `bun run test`, and `bun run typecheck`.
+- [docs][oss] Rewrote `README.md` to describe the product and its advantages, added `DEVELOPMENT.md` for contributor setup and troubleshooting, and updated repo policy/docs to remove Docker-first guidance.
+
 ### 2026-03-14
 - [docs][harness][policy] Added the initial DELIVERATOR harness layer: `AGENTS.md`, `CLAUDE.md`, `openspec/project.md`, `openspec/config.yaml` context/rules, `ARCHITECTURE.md`, `docs/index.md`, `docs/PLANS.md`, and shared Claude settings, including Tier 0/Tier 1/Tier 2 planning rules and frontend-design guidance for substantial UI/UX work.
 - [foundation][runtime][obs] Initialized the technical foundation: `pnpm` + `turbo` workspace, unified `apps/server` Fastify + Vite SPA, shared packages, SQLite bootstrap, `make dev` scripts, and the local Grafana/Tempo/Prometheus/Loki/Promtail/OTel stack. The current UI shell is intentionally client-rendered and not SSR-based.

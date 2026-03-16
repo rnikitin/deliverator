@@ -8,3 +8,11 @@ export const queryClient = new QueryClient({
     }
   }
 });
+
+const GLOBAL_QUERY_KEYS = [["projects"], ["dashboard"], ["feed"]] as const;
+
+export function invalidateGlobalQueries(qc: QueryClient): void {
+  for (const queryKey of GLOBAL_QUERY_KEYS) {
+    void qc.invalidateQueries({ queryKey });
+  }
+}

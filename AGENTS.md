@@ -3,10 +3,10 @@
 ## Project Identity
 - DELIVERATOR is a workflow orchestration system for AI CLI agents.
 - It is a long-running workflow service with a deterministic control plane, not a top-level autonomous agent.
-- The current repository state is foundation-bootstrapped: the monorepo, `apps/server`, shared packages, Docker/dev scripts, and observability scaffold already exist.
+- The current repository state is foundation-bootstrapped and runtime-bearing: the monorepo, `apps/server`, `apps/cli`, shared packages, per-project registry/runtime model, and Bun-based local workflow already exist.
 
 ## Current Phase
-- This phase focuses on hardening the technical foundation and layering in product functionality without breaking the one-site runtime, deterministic workflow rules, or local developer ergonomics.
+- This phase focuses on hardening the project-registry runtime, CLI-first local workflow, and per-project storage model without breaking the one-site runtime or deterministic workflow rules.
 - Do not re-bootstrap the monorepo or re-argue already-settled repo-level decisions unless the user explicitly asks for a new architectural change.
 - Treat the current repo as an implemented foundation plus research pack, not as a docs-only workspace.
 
@@ -28,7 +28,9 @@
   - backend/API shape: `docs/research/docs/09-backend-api.md`
 - `docs/research/` is read-only reference material. Do not edit it unless the user explicitly asks to change the imported research pack.
 - The example files under `docs/research/.deliverator/` are product reference material, not active repo config.
-- The repo-root `.deliverator/` directory is gitignored local runtime state. Keep databases, worktrees, logs, generated ports/env files, and similar local artifacts there rather than scattering them across the repo root.
+- Global DELIVERATOR app state lives under `~/.deliverator`.
+- Managed project state lives under `<project>/.deliverator/shared` and `<project>/.deliverator/local`.
+- Do not treat the DELIVERATOR app repo root as the global runtime home. If this repo is itself registered as a managed project, only `.deliverator/local/` should stay uncommitted.
 
 ## Source of Truth
 - `AGENTS.md` is the cross-tool collaboration contract.
@@ -41,9 +43,9 @@
 - Keep maps short and point to deeper docs instead of duplicating large blocks of detail.
 
 ## Tech Stack
-- Node.js 22
+- Bun 1.3+ as the package manager and primary command runner
+- Node.js 22 for the compatible TypeScript/runtime path used by the current SQLite/Fastify stack
 - TypeScript with strict settings
-- pnpm as the package manager
 - Fastify as the server runtime
 - React + Vite for the UI
 - SQLite for v1 persistence
@@ -156,19 +158,20 @@
 - Common repo-level commands:
   - `openspec list`
   - `openspec validate`
-  - `make dev`
-  - `make dev-start`
-  - `make down`
-  - `make smoke-services`
-  - `pnpm install`
-  - `pnpm build`
-  - `pnpm test`
-  - `pnpm lint`
-  - `pnpm typecheck`
+  - `bun install`
+  - `bun run dev`
+  - `bun run start`
+  - `bun run open`
+  - `bun run logs -- --grep <text>`
+  - `bun run build`
+  - `bun run test`
+  - `bun run lint`
+  - `bun run typecheck`
 - When documenting commands, always state the working directory and the observable success condition.
 
 ## Out of Scope for This Phase
 - No git bootstrap or repo hygiene automation unless explicitly requested.
-- No committed `.deliverator/` product config yet. The repo-root `.deliverator/` directory is reserved for local gitignored runtime state.
-- No CI, hooks, or deployment automation yet.
+- No Docker-first runtime path or observability stack revival unless explicitly requested through a new approved architectural change.
+- No committed repo-root `.deliverator/` app-state directory. Global app state belongs in `~/.deliverator`, while project-local `.deliverator/` trees belong to managed projects.
+- No deployment automation yet.
 - No nested policy files unless the repo grows enough to justify them.

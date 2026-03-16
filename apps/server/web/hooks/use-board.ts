@@ -16,21 +16,29 @@ export interface BoardColumn {
 }
 
 export interface BoardData {
+  project: {
+    id: string;
+    slug: string;
+    name: string;
+    rootPath: string;
+    createdAt: string;
+  };
   columns: BoardColumn[];
   allowedMoves: Record<string, string[]>;
 }
 
-async function fetchBoard(): Promise<BoardData> {
-  const response = await fetch("/api/board");
+async function fetchBoard(projectSlug: string): Promise<BoardData> {
+  const response = await fetch(`/api/projects/${encodeURIComponent(projectSlug)}/board`);
   if (!response.ok) {
     throw new Error(`Board fetch failed: ${response.status}`);
   }
   return response.json() as Promise<BoardData>;
 }
 
-export function useBoard() {
+export function useBoard(projectSlug: string) {
   return useQuery({
-    queryKey: ["board"],
-    queryFn: fetchBoard
+    queryKey: ["project-board", projectSlug],
+    queryFn: () => fetchBoard(projectSlug),
+    enabled: Boolean(projectSlug)
   });
 }

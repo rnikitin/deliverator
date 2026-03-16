@@ -1,84 +1,106 @@
 # ARCHITECTURE
 
-This document is the short, stable codemap for DELIVERATOR. Keep it high level and point to deeper docs instead of turning it into an encyclopedia.
-
-If you are new here, start with:
-- `AGENTS.md`
-- `CLAUDE.md`
-- `docs/index.md`
-- `docs/PLANS.md`
+This is the short codemap for DELIVERATOR.
 
 ## Bird's-Eye View
 
-DELIVERATOR is a workflow orchestration system for AI CLI agents. It owns the board, workflow state machine, approvals, run orchestration, artifact indexing, and evidence trail around automated work.
+DELIVERATOR is a local-first workflow orchestration surface for AI CLI agents.
 
-It is not a top-level autonomous agent. Workflow authority belongs to deterministic code, policies, and schemas.
+It is:
+- deterministic in workflow authority
+- project-scoped in board/task state
+- global in dashboard/feed visibility
 
-## Intended System Shape
+It is not:
+- a top-level autonomous agent
+- a Docker-managed local platform
+- a split frontend/backend deployment in local development
 
-The research pack in `docs/research/` describes a larger target monorepo. The current repo-level implementation direction is:
+## Runtime Shape
+
+The current implementation direction is:
 - one Fastify application owns API routes, SSE, and site hosting
-- Vite is integrated into the Fastify app and serves a client-rendered React SPA
-- package boundaries are still important, but there is no separate frontend runtime in v1
-- milestone 1 uses a client-rendered SPA by design
-- SSR is intentionally out of scope for the current milestone and requires a new explicit architectural change decision if it is ever introduced
+- Vite serves a client-rendered React SPA inside that same app
+- `apps/cli` owns the `deliverator` command surface
+- global app state lives under `~/.deliverator`
+- each managed project owns `<project>/.deliverator/shared` and `<project>/.deliverator/local`
 
-Expected major areas once implementation begins:
-- `apps/server` for Fastify, API, SSE, and UI hosting
-- `packages/core` for workflow types, schema/compiler logic, state transitions, and policies
-- `packages/db` for SQLite schema, migrations, and repositories
-- `packages/runner` for invocation bundles, process execution, and validation glue
-- `packages/artifacts` for immutable evidence, artifact indexing, and canonical/snapshot resolution
-- `packages/adapters/*` for agent, runtime, SCM, and project-command integrations
+## Major Areas
 
-## System Layers
+- `apps/cli/`
+  - `deliverator start`
+  - `deliverator open`
+  - `deliverator logs`
+- `apps/server/`
+  - Fastify app
+  - SPA hosting
+  - API routes
+  - SSE
+- `packages/core/`
+  - workflow defaults
+  - workflow compilation
+  - deterministic bootstrap/domain helpers
+- `packages/db/`
+  - registry DB
+  - project DB access
+  - migrations
+  - feed/task queries
+- `packages/shared/`
+  - global path resolution
+  - project path resolution
+  - runtime metadata helpers
+- `packages/contracts/`
+  - shared types and schemas
 
-- Control plane:
-  - projects
-  - tasks
-  - board state
-  - stage transitions
-  - approvals
-  - comments and attachments
-  - run scheduling
-  - artifact indexing
-- Execution plane:
-  - workspaces
-  - local process runs
-  - docker compose environments
-  - CLI tools such as `codex`, `claude`, `git`, `gh`, and `openspec`
+## Storage Model
 
-The control plane decides what is allowed to run and why. The execution plane performs the work and emits evidence.
+Global app state:
 
-## Architectural Invariants
+```text
+~/.deliverator/
+  data/registry.db
+  run/current.json
+  logs/app.jsonl
+```
 
-- Workflow transitions, approvals, retries, and policy gates stay deterministic.
-- Workspace and artifact continuity matter more than chat/session continuity.
-- Action intent, recipe composition, and adapter execution stay separated.
-- Evidence is immutable even if workspaces are cleaned up later.
-- Fastify owns API and site hosting in v1.
-- UI work must remain responsive, accessible, and integrated into the single-site architecture.
-- Significant UI/UX work should use the `frontend-design` skill before implementation.
-- Non-trivial changes follow `docs/PLANS.md`, then `openspec/` when required by the change tier.
+Per-project state:
+
+```text
+<project>/.deliverator/
+  shared/
+  local/
+```
+
+`shared/` is versionable.
+
+`local/` is local-only runtime state.
+
+## UI Model
+
+- `/dashboard` is global
+- `/feed` is global
+- `/projects` manages the project registry
+- `/projects/:projectSlug/board` is the canonical board
+- `/projects/:projectSlug/tasks/:taskId` is the canonical task detail route
+
+`/` redirects to the last selected project board when one exists, otherwise to `/projects`.
 
 ## Startup Sequence
 
-`apps/server/src/main.ts` boots the server in this order:
+Local startup is:
 
-1. `resolveRepoRoot()` + `loadAppConfig()` — resolve the repo root and load environment-driven config
-2. `bootstrapTelemetry(config)` — initialize OpenTelemetry
-3. `initializeProductConfig(rootDir)` — scaffold `.deliverator/` with default product config files (workflow, recipes, schemas, prompts, validators) if missing
-4. `openDatabase(config.paths)` + `applyMigrations(dbContext)` — open SQLite and run migrations
-5. `seedDevelopmentState(dbContext, rootDir)` — seed dev data (non-production only)
-6. `loadAndCompileWorkflow(rootDir)` — read and compile `.deliverator/workflow.yaml` into memory
-7. `createApp({ config, dbContext, workflow })` — create the Fastify instance with all routes, then `app.listen()`
+1. `deliverator start` or `bun run start`
+2. resolve global paths under `~/.deliverator`
+3. open and migrate the registry DB
+4. seed a development project when the registry is empty in non-production mode
+5. create the Fastify + Vite app
+6. lazily resolve project contexts on demand
+7. write the current runtime URL to `~/.deliverator/run/current.json`
 
-Shutdown registers `SIGINT`/`SIGTERM` handlers that close the Fastify app and flush telemetry.
+## Invariants
 
-## Where to Go Deeper
-
-- Knowledge base index: `docs/index.md`
-- Planning and change management: `docs/PLANS.md`
-- Implementation history: `docs/CHANGELOG.md`
-- OpenSpec conventions: `openspec/project.md`
-- Research pack: `docs/research/`
+- Workflow decisions stay deterministic.
+- Fastify remains the only app server in v1.
+- SSR is out of scope unless a new architectural change explicitly adds it.
+- Docker is not part of the supported local runtime path.
+- Structured JSONL logs are the supported local diagnostic layer.

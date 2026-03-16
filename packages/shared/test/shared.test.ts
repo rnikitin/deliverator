@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { deriveWorktreeIdentity, getDevRuntimePaths, sanitizeSlug } from "../src/index.js";
+import { deriveWorktreeIdentity, resolveGlobalAppPaths, resolveProjectPaths, sanitizeSlug } from "../src/index.js";
 
 describe("shared", () => {
   it("derives stable worktree identity", () => {
@@ -10,10 +10,13 @@ describe("shared", () => {
     expect(identity.projectName).toMatch(/^deliverator-/);
   });
 
-  it("resolves dev runtime paths", () => {
-    const paths = getDevRuntimePaths("/tmp/repo");
+  it("resolves global and project runtime paths", () => {
+    const globalPaths = resolveGlobalAppPaths({ HOME: "/tmp/home" } as NodeJS.ProcessEnv);
+    const projectPaths = resolveProjectPaths("/tmp/repo");
 
-    expect(paths.dataDir).toBe("/tmp/repo/.deliverator/data");
+    expect(globalPaths.registryDbPath).toBe("/tmp/home/.deliverator/data/registry.db");
+    expect(projectPaths.sharedDir).toBe("/tmp/repo/.deliverator/shared");
+    expect(projectPaths.localDir).toBe("/tmp/repo/.deliverator/local");
     expect(sanitizeSlug("Deliverator Repo")).toBe("deliverator-repo");
   });
 });

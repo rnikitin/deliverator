@@ -7,6 +7,7 @@ declare module "better-sqlite3" {
 
   export default class Database {
     constructor(path: string);
+    close(): void;
     exec(sql: string): void;
     pragma(sql: string): void;
     prepare(sql: string): Statement;

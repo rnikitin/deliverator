@@ -1,45 +1,17 @@
 import { useEffect } from "react";
 
 import { cn } from "../lib/utils.js";
-import { useTask } from "../hooks/use-task.js";
-
-const ATTENTION_BADGE_COLORS: Record<string, string> = {
-  actively_working: "bg-state-working text-white",
-  awaiting_human_input: "bg-state-input text-white",
-  awaiting_human_approval: "bg-state-approval text-white",
-  blocked: "bg-state-blocked text-white",
-  ready_for_feedback: "bg-state-feedback text-white",
-  ready_to_archive: "bg-state-archive text-white",
-  paused_for_human: "bg-state-paused text-white"
-};
-
-const ATTENTION_LABELS: Record<string, string> = {
-  actively_working: "WORKING",
-  awaiting_human_input: "NEEDS INPUT",
-  awaiting_human_approval: "NEEDS APPROVAL",
-  blocked: "BLOCKED",
-  ready_for_feedback: "READY FOR REVIEW",
-  ready_to_archive: "ARCHIVE",
-  paused_for_human: "PAUSED"
-};
-
-const STAGE_DOT_COLORS: Record<string, string> = {
-  inbox: "bg-stage-inbox",
-  discovery: "bg-stage-discovery",
-  research: "bg-stage-research",
-  build_test: "bg-stage-build",
-  feedback: "bg-stage-feedback",
-  deploy: "bg-stage-deploy",
-  done: "bg-stage-done"
-};
+import { ATTENTION_BADGE_COLORS, ATTENTION_BADGE_FALLBACK, ATTENTION_LABELS, STAGE_DOT_COLORS } from "../lib/board-styles.js";
+import { useTask, type TaskData } from "../hooks/use-task.js";
 
 interface TaskSidebarProps {
+  projectSlug: string;
   taskId: string;
   onClose: () => void;
 }
 
-export function TaskSidebar({ taskId, onClose }: TaskSidebarProps) {
-  const { data: task, isLoading, error } = useTask(taskId);
+export function TaskSidebar({ projectSlug, taskId, onClose }: TaskSidebarProps) {
+  const { data: task, isLoading, error } = useTask(projectSlug, taskId);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -99,22 +71,9 @@ export function TaskSidebar({ taskId, onClose }: TaskSidebarProps) {
   );
 }
 
-interface TaskSidebarContentProps {
-  task: {
-    id: string;
-    title: string;
-    stage: string;
-    attentionState: string;
-    summary: string;
-    projectId?: string;
-    createdAt?: string;
-    updatedAt?: string;
-  };
-}
-
-function TaskSidebarContent({ task }: TaskSidebarContentProps) {
+function TaskSidebarContent({ task }: { task: TaskData }) {
   const dotClass = STAGE_DOT_COLORS[task.stage] ?? "bg-muted-foreground";
-  const badgeClass = ATTENTION_BADGE_COLORS[task.attentionState] ?? "bg-muted text-muted-foreground";
+  const badgeClass = ATTENTION_BADGE_COLORS[task.attentionState] ?? ATTENTION_BADGE_FALLBACK;
   const badgeLabel = ATTENTION_LABELS[task.attentionState] ?? task.attentionState;
 
   return (
@@ -144,22 +103,6 @@ function TaskSidebarContent({ task }: TaskSidebarContentProps) {
           <p className="mt-2 font-body text-base text-foreground">{task.summary}</p>
         </div>
       )}
-
-      <div>
-        <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Details
-        </h3>
-        <dl className="mt-2 space-y-2">
-          <div className="flex items-center gap-3">
-            <dt className="font-body text-sm text-muted-foreground">Stage</dt>
-            <dd className="font-body text-sm text-foreground">{task.stage}</dd>
-          </div>
-          <div className="flex items-center gap-3">
-            <dt className="font-body text-sm text-muted-foreground">Attention</dt>
-            <dd className="font-body text-sm text-foreground">{task.attentionState}</dd>
-          </div>
-        </dl>
-      </div>
 
       <div>
         <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground">

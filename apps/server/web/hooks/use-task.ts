@@ -11,11 +11,17 @@ export interface TaskData {
 
 interface TaskResponse {
   ok: boolean;
+  project: {
+    slug: string;
+    name: string;
+  };
   task: TaskData;
 }
 
-async function fetchTask(taskId: string): Promise<TaskData> {
-  const response = await fetch(`/api/tasks/${encodeURIComponent(taskId)}`);
+async function fetchTask(projectSlug: string, taskId: string): Promise<TaskData> {
+  const response = await fetch(
+    `/api/projects/${encodeURIComponent(projectSlug)}/tasks/${encodeURIComponent(taskId)}`
+  );
   if (!response.ok) {
     throw new Error(`Task fetch failed: ${response.status}`);
   }
@@ -23,10 +29,10 @@ async function fetchTask(taskId: string): Promise<TaskData> {
   return data.task;
 }
 
-export function useTask(taskId: string) {
+export function useTask(projectSlug: string, taskId: string) {
   return useQuery({
-    queryKey: ["task", taskId],
-    queryFn: () => fetchTask(taskId),
-    enabled: Boolean(taskId)
+    queryKey: ["project-task", projectSlug, taskId],
+    queryFn: () => fetchTask(projectSlug, taskId),
+    enabled: Boolean(projectSlug && taskId)
   });
 }

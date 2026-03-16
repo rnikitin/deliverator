@@ -10,6 +10,7 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "test/**/*.ts",
+    "../../packages/db/src/**/*.d.ts",
     "web/**/*.ts",
     "web/**/*.tsx",
     "vite.config.ts"

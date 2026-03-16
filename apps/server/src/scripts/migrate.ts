@@ -1,10 +1,12 @@
-import { applyMigrations, openDatabase } from "@deliverator/db";
+import { loadAppConfig, resolveWorkspaceRoot } from "../config.js";
+import { ProjectRegistryManager } from "../project-manager.js";
 
-import { loadAppConfig, resolveRepoRoot } from "../config.js";
+const config = loadAppConfig(process.env);
+const manager = new ProjectRegistryManager(config, resolveWorkspaceRoot());
+manager.ensureDevelopmentProject();
 
-const rootDir = resolveRepoRoot();
-const config = loadAppConfig(rootDir, process.env);
-const dbContext = openDatabase(config.paths);
-const applied = applyMigrations(dbContext);
+for (const context of manager.getAllProjectContexts()) {
+  process.stdout.write(`Prepared ${context.project.slug} (${context.dbContext.filePath}).\n`);
+}
 
-process.stdout.write(`Applied ${applied} migrations to ${dbContext.filePath}.\n`);
+manager.close();

@@ -3,12 +3,12 @@
 ## Purpose
 DELIVERATOR is a workflow orchestration system for AI CLI agents. The product is board-first and workflow-first: it owns task state, stage transitions, approvals, evidence collection, and operator visibility around automated work. It is not a top-level agent that is free to mutate state however it wants.
 
-The current repository phase is foundation-bootstrapped. This repo already contains the technical foundation: the monorepo, `apps/server`, shared packages, Docker/dev scripts, observability scaffold, architecture research, ADRs, example workflow artifacts, and OpenSpec skills. Changes should advance the implementation one phase at a time rather than re-bootstrap the foundation.
+The current repository phase is foundation-bootstrapped and runtime-bearing. This repo already contains the monorepo, `apps/server`, `apps/cli`, shared packages, per-project registry/runtime code, architecture research, ADRs, example workflow artifacts, and OpenSpec skills. Changes should advance the implementation one phase at a time rather than re-bootstrap the foundation.
 
 ## Tech Stack
-- Node.js 22
+- Bun 1.3+ as the package manager and primary command runner
+- Node.js 22 for the compatible runtime path used by the current SQLite/Fastify stack
 - TypeScript with strict settings
-- pnpm as the package manager
 - Fastify as the server runtime
 - React + Vite for the UI
 - SQLite for v1 persistence
@@ -18,7 +18,7 @@ The current repository phase is foundation-bootstrapped. This repo already conta
 
 One explicit repo-level decision overrides the older research layout: the Fastify app owns API routes, SSE, and site hosting. Vite is integrated into that Fastify app. Do not introduce a separate frontend runtime in v1 unless a new approved architectural change explicitly replaces this decision.
 
-Repo-local generated runtime state belongs under `.deliverator/` in the repository root. That gitignored directory is the expected home for development databases, worktrees, logs, generated port/env state, and similar local artifacts.
+Global app state belongs under `~/.deliverator`. Managed project runtime state belongs under each target project's `.deliverator/shared` and `.deliverator/local`. Do not treat the DELIVERATOR repo root as the global runtime home.
 
 ## Domain Context
 Core reference material lives under `docs/research/` and is read-only unless the user explicitly asks to modify the imported research pack.

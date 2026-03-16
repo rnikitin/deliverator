@@ -1,0 +1,32 @@
+{
+  "name": "@deliverator/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "deliverator": "dist/apps/cli/src/main.js"
+  },
+  "main": "dist/apps/cli/src/main.js",
+  "types": "dist/apps/cli/src/main.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/apps/cli/src/main.d.ts",
+      "development": "./src/main.ts",
+      "default": "./dist/apps/cli/src/main.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch --conditions=development --tsconfig tsconfig.json src/main.ts start",
+    "lint": "eslint src --ext .ts",
+    "start": "node dist/apps/cli/src/main.js start",
+    "open": "node dist/apps/cli/src/main.js open",
+    "logs": "node dist/apps/cli/src/main.js logs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@deliverator/db": "workspace:*",
+    "@deliverator/server": "workspace:*",
+    "@deliverator/shared": "workspace:*"
+  }
+}

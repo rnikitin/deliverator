@@ -1,8 +1,7 @@
 import fs from "node:fs";
-import path from "node:path";
 
 import type { CompiledWorkflow } from "@deliverator/contracts";
-import { ensureDirectory } from "@deliverator/shared";
+import { ensureDirectory, resolveProjectPaths, type ProjectPaths } from "@deliverator/shared";
 import { parse as parseYaml } from "yaml";
 
 import { DEFAULT_WORKFLOW_YAML } from "./defaults.js";
@@ -26,12 +25,13 @@ interface WorkflowYaml {
  * Load and compile the workflow YAML from disk. If the file does not exist,
  * auto-create it from the built-in default before compiling.
  *
- * @param repoRoot - Repository root path (workflow file is at `<repoRoot>/.deliverator/workflow.yaml`)
+ * @param input - Project root path or resolved project paths
  * @returns The compiled workflow (stages, allowed moves)
  */
-export function loadAndCompileWorkflow(repoRoot: string): CompiledWorkflow {
-  const workflowDir = path.join(repoRoot, ".deliverator");
-  const workflowPath = path.join(workflowDir, "workflow.yaml");
+export function loadAndCompileWorkflow(input: string | ProjectPaths): CompiledWorkflow {
+  const projectPaths = typeof input === "string" ? resolveProjectPaths(input) : input;
+  const workflowDir = projectPaths.sharedDir;
+  const workflowPath = projectPaths.workflowFilePath;
 
   // Defensive fallback — initializeProductConfig normally creates this file at startup,
   // but this ensures loadAndCompileWorkflow works standalone (e.g. in tests or CLI tools that skip full init).

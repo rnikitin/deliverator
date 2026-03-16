@@ -1,0 +1,34 @@
+recipe_id: research.execplan
+kind: artifact_recipe
+description: Produce or revise the canonical ExecPlan artifact for the task.
+
+resolver:
+  mode: personalizable
+  candidates:
+    - repo://.deliverator/recipes/research.execplan.yml
+    - profile://recipes/research.execplan.yml
+
+actions:
+  - kind: agent.run
+    uses: claude_cli
+    with:
+      system_prompt_file: .deliverator/prompts/research/execplan.system.md
+      skill_ref: profile://execplan/default
+      output_schema: .deliverator/schemas/action-result.schema.json
+
+inputs:
+  - task.title
+  - task.description
+  - task.comments.stage
+  - task.attachments.stage
+  - artifacts/current/discovery_questions.md
+  - artifacts/current/discovery_answers.md
+  - repo.context
+
+outputs:
+  - path: artifacts/current/execplan.md
+    kind: execplan
+
+validators:
+  - markdown_exists
+  - execplan_contract_v1

@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { PathsConfig } from "@deliverator/contracts";
+import type { ProjectPaths } from "@deliverator/contracts";
 
 export interface ArtifactRoots {
   artifactsDir: string;
@@ -11,19 +11,19 @@ export interface ArtifactRoots {
   worktreesDir: string;
 }
 
-export function resolveArtifactRoots(paths: PathsConfig): ArtifactRoots {
-  const artifactsDir = path.join(paths.dataDir, "artifacts");
+export function resolveArtifactRoots(paths: ProjectPaths): ArtifactRoots {
+  const artifactsDir = paths.artifactsDir;
 
   return {
     artifactsDir,
     canonicalDir: path.join(artifactsDir, "canonical"),
-    databaseFile: path.join(paths.dataDir, "deliverator.db"),
+    databaseFile: paths.databaseFilePath,
     logsDir: paths.logsDir,
     snapshotsDir: path.join(artifactsDir, "snapshots"),
-    worktreesDir: paths.worktreeDir
+    worktreesDir: paths.worktreesDir
   };
 }
 
-export function resolveRunArtifactDir(paths: PathsConfig, runId: string): string {
+export function resolveRunArtifactDir(paths: ProjectPaths, runId: string): string {
   return path.join(resolveArtifactRoots(paths).canonicalDir, "runs", runId);
 }

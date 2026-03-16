@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deliverator.dev/schemas/recipe.schema.json",
+  "title": "Recipe",
+  "type": "object",
+  "required": [
+    "recipe_id",
+    "kind",
+    "actions"
+  ],
+  "properties": {
+    "recipe_id": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "resolver": {
+      "type": "object"
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "uses"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "uses": {
+            "type": "string"
+          },
+          "with": {
+            "type": "object"
+          },
+          "repeat": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "kind"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "validators": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

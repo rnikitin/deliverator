@@ -7,16 +7,15 @@ describe("contracts", () => {
     const config = assertSchema(AppConfigSchema, {
       nodeEnv: "development",
       port: 3000,
-      paths: {
-        dataDir: "/tmp/data",
-        worktreeDir: "/tmp/worktrees",
-        logsDir: "/tmp/logs"
-      },
-      telemetry: {
-        serviceName: "deliverator-server",
-        otlpEndpoint: "http://localhost:4318",
-        browserTracingEnabled: true,
-        metricsPath: "/api/metrics"
+      serviceName: "deliverator-server",
+      globalPaths: {
+        homeDir: "/tmp/home/.deliverator",
+        dataDir: "/tmp/home/.deliverator/data",
+        logsDir: "/tmp/home/.deliverator/logs",
+        runDir: "/tmp/home/.deliverator/run",
+        registryDbPath: "/tmp/home/.deliverator/data/registry.db",
+        runtimeStatePath: "/tmp/home/.deliverator/run/current.json",
+        appLogFilePath: "/tmp/home/.deliverator/logs/app.jsonl"
       }
     });
 
@@ -27,7 +26,7 @@ describe("contracts", () => {
     expect(() =>
       assertSchema(InvocationBundleSchema, {
         adapterId: "local-process",
-        command: "pnpm",
+        command: "bun",
         args: [],
         cwd: 42
       })

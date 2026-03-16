@@ -32,6 +32,9 @@
       "@deliverator/db": [
         "packages/db/src/index.ts"
       ],
+      "@deliverator/server": [
+        "apps/server/src/index.ts"
+      ],
       "@deliverator/artifacts": [
         "packages/artifacts/src/index.ts"
       ],

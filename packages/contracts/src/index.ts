@@ -18,17 +18,40 @@ const AttentionStateSchema = Type.Union([
   Type.Literal("paused_for_human")
 ]);
 
-const PathsConfigSchema = Type.Object({
+const RuntimePathsSchema = Type.Object({
   dataDir: Type.String(),
   worktreeDir: Type.String(),
   logsDir: Type.String()
 });
 
-const TelemetryConfigSchema = Type.Object({
-  serviceName: Type.String(),
-  otlpEndpoint: Type.String(),
-  browserTracingEnabled: Type.Boolean(),
-  metricsPath: Type.String()
+const GlobalAppPathsSchema = Type.Object({
+  homeDir: Type.String(),
+  dataDir: Type.String(),
+  logsDir: Type.String(),
+  runDir: Type.String(),
+  registryDbPath: Type.String(),
+  runtimeStatePath: Type.String(),
+  appLogFilePath: Type.String()
+});
+
+const ProjectPathsSchema = Type.Object({
+  rootPath: Type.String(),
+  deliveratorDir: Type.String(),
+  sharedDir: Type.String(),
+  localDir: Type.String(),
+  workflowFilePath: Type.String(),
+  projectFilePath: Type.String(),
+  databaseFilePath: Type.String(),
+  artifactsDir: Type.String(),
+  worktreesDir: Type.String(),
+  logsDir: Type.String()
+});
+
+const RuntimeStateSchema = Type.Object({
+  pid: Type.Number(),
+  port: Type.Number(),
+  url: Type.String(),
+  startedAt: Type.String()
 });
 
 const WorkflowStageSchema = Type.Object({
@@ -44,8 +67,16 @@ const AppConfigSchema = Type.Object({
     Type.Literal("production")
   ]),
   port: Type.Number(),
-  paths: PathsConfigSchema,
-  telemetry: TelemetryConfigSchema
+  serviceName: Type.String(),
+  globalPaths: GlobalAppPathsSchema
+});
+
+const RegisteredProjectSchema = Type.Object({
+  id: Type.String(),
+  slug: Type.String(),
+  name: Type.String(),
+  rootPath: Type.String(),
+  createdAt: Type.String()
 });
 
 const ProjectSchema = Type.Object({
@@ -72,6 +103,32 @@ const TaskEventSchema = Type.Object({
   createdAt: Type.String()
 });
 
+const FeedEventSchema = Type.Object({
+  id: Type.String(),
+  projectSlug: Type.String(),
+  projectName: Type.String(),
+  taskId: Type.String(),
+  type: Type.String(),
+  createdAt: Type.String(),
+  payload: Type.Record(Type.String(), Type.Unknown())
+});
+
+const ActionableTaskSchema = Type.Object({
+  projectSlug: Type.String(),
+  projectName: Type.String(),
+  taskId: Type.String(),
+  title: Type.String(),
+  stage: StageSchema,
+  attentionState: AttentionStateSchema,
+  summary: Type.String()
+});
+
+const DashboardDataSchema = Type.Object({
+  counts: Type.Record(Type.String(), Type.Number()),
+  actionableItems: Type.Array(ActionableTaskSchema),
+  recentEvents: Type.Array(FeedEventSchema)
+});
+
 const WorkspaceSchema = Type.Object({
   id: Type.String(),
   taskId: Type.String(),
@@ -79,16 +136,18 @@ const WorkspaceSchema = Type.Object({
   branchName: Type.String()
 });
 
+const RunStatusSchema = Type.Union([
+  Type.Literal("pending"),
+  Type.Literal("running"),
+  Type.Literal("completed"),
+  Type.Literal("failed")
+]);
+
 const RunSchema = Type.Object({
   id: Type.String(),
   taskId: Type.String(),
   stage: StageSchema,
-  status: Type.Union([
-    Type.Literal("pending"),
-    Type.Literal("running"),
-    Type.Literal("completed"),
-    Type.Literal("failed")
-  ]),
+  status: RunStatusSchema,
   createdAt: Type.String()
 });
 
@@ -96,12 +155,7 @@ const ActionRunSchema = Type.Object({
   id: Type.String(),
   runId: Type.String(),
   adapterId: Type.String(),
-  status: Type.Union([
-    Type.Literal("pending"),
-    Type.Literal("running"),
-    Type.Literal("completed"),
-    Type.Literal("failed")
-  ]),
+  status: RunStatusSchema,
   correlationId: Type.String()
 });
 
@@ -186,6 +240,7 @@ const CompiledWorkflowSchema = Type.Object({
 const CompiledConfigSchema = Type.Object({
   generatedAt: Type.String(),
   app: AppConfigSchema,
+  project: RegisteredProjectSchema,
   workflow: CompiledWorkflowSchema,
   operatorShell: Type.Object({
     title: Type.String(),
@@ -195,16 +250,23 @@ const CompiledConfigSchema = Type.Object({
 
 export type Stage = Static<typeof StageSchema>;
 export type AttentionState = Static<typeof AttentionStateSchema>;
-export type PathsConfig = Static<typeof PathsConfigSchema>;
-export type TelemetryConfig = Static<typeof TelemetryConfigSchema>;
+export type RuntimePaths = Static<typeof RuntimePathsSchema>;
+export type GlobalAppPaths = Static<typeof GlobalAppPathsSchema>;
+export type ProjectPaths = Static<typeof ProjectPathsSchema>;
+export type RuntimeState = Static<typeof RuntimeStateSchema>;
 export type WorkflowStage = Static<typeof WorkflowStageSchema>;
 export type CompiledStage = Static<typeof CompiledStageSchema>;
 export type CompiledWorkflow = Static<typeof CompiledWorkflowSchema>;
 export type AppConfig = Static<typeof AppConfigSchema>;
+export type RegisteredProject = Static<typeof RegisteredProjectSchema>;
 export type Project = Static<typeof ProjectSchema>;
 export type Task = Static<typeof TaskSchema>;
 export type TaskEvent = Static<typeof TaskEventSchema>;
+export type FeedEvent = Static<typeof FeedEventSchema>;
+export type ActionableTask = Static<typeof ActionableTaskSchema>;
+export type DashboardData = Static<typeof DashboardDataSchema>;
 export type Workspace = Static<typeof WorkspaceSchema>;
+export type RunStatus = Static<typeof RunStatusSchema>;
 export type Run = Static<typeof RunSchema>;
 export type ActionRun = Static<typeof ActionRunSchema>;
 export type Artifact = Static<typeof ArtifactSchema>;
@@ -220,6 +282,7 @@ export type CompiledConfig = Static<typeof CompiledConfigSchema>;
 export {
   ActionResultSchema,
   ActionRunSchema,
+  ActionableTaskSchema,
   AppConfigSchema,
   ApprovalSchema,
   ArtifactSchema,
@@ -229,16 +292,22 @@ export {
   CompiledConfigSchema,
   CompiledStageSchema,
   CompiledWorkflowSchema,
+  DashboardDataSchema,
+  FeedEventSchema,
+  GlobalAppPathsSchema,
   InvocationBundleSchema,
-  PathsConfigSchema,
+  ProjectPathsSchema,
   ProjectSchema,
+  RegisteredProjectSchema,
+  RuntimePathsSchema,
+  RuntimeStateSchema,
   RunSchema,
+  RunStatusSchema,
   SseEventSchema,
   StageResultSchema,
   StageSchema,
   TaskEventSchema,
   TaskSchema,
-  TelemetryConfigSchema,
   WorkflowStageSchema,
   WorkspaceSchema
 };
@@ -253,13 +322,24 @@ export const ATTENTION_STATES = [
   { id: "paused_for_human" as const, label: "Paused" }
 ] satisfies ReadonlyArray<{ id: AttentionState; label: string }>;
 
+const validatorCache = new WeakMap<TSchema, ReturnType<typeof ajv.compile>>();
+
+function getValidator<T extends TSchema>(schema: T): ReturnType<typeof ajv.compile> {
+  let validator = validatorCache.get(schema);
+  if (!validator) {
+    validator = ajv.compile(schema);
+    validatorCache.set(schema, validator);
+  }
+  return validator;
+}
+
 export function validateSchema<T extends TSchema>(schema: T, value: unknown): value is Static<T> {
-  const validator = ajv.compile(schema);
-  return validator(value);
+  const validator = getValidator(schema);
+  return validator(value) as boolean;
 }
 
 export function assertSchema<T extends TSchema>(schema: T, value: unknown): Static<T> {
-  const validator = ajv.compile(schema);
+  const validator = getValidator(schema);
   if (validator(value)) {
     return value as Static<T>;
   }
